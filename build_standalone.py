@@ -452,7 +452,7 @@ js_body = re.sub(r'\bthis\.([a-zA-Z_][a-zA-Z0-9_]*)\(', r'\1(', js_body)
 
 # Convert method declarations to function declarations
 # handles both `  methodName(args) {` and `  async methodName(args) {`
-METHODS = 'componentDidMount|initBPMPulse|initWorldMap|_drawMap|_geoPath|initParticles|initGlitch'
+METHODS = 'componentDidMount|initBPMPulse|initWorldMap|_drawMap|_geoPath|initParticles|initGlitch|initLightbox'
 def method_to_fn(m):
     indent  = m.group(1)
     async_  = 'async ' if m.group(2) else ''
