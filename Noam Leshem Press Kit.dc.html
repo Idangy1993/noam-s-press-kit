@@ -69,7 +69,7 @@
     .photo-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;grid-template-rows:auto !important;}
     .shows-grid{grid-template-columns:1fr !important;}
     .photo-grid > div{grid-column:auto !important;grid-row:auto !important;aspect-ratio:4/3;}
-    .photo-grid > div:first-child,.photo-grid > div:last-child{grid-column:1 / 3 !important;aspect-ratio:16 / 9;}
+    .photo-grid > div:first-child,.photo-grid > div:nth-child(5),.photo-grid > div:last-child{grid-column:1 / 3 !important;aspect-ratio:16 / 9;}
   }
 </style>
 </helmet>
@@ -313,11 +313,11 @@
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .14s,transform .7s ease .14s;border-radius:14px;overflow:hidden;background:#110F17;">
           <img loading="lazy" decoding="async" src="uploads/web/IMG_6952.jpg" alt="Noam Leshem" style="width:100%;height:100%;object-fit:cover;object-position:center 20%;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
         </div>
-        <!-- R3: B&W small | B&W wide (different sizes = ok) -->
-        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .18s,transform .7s ease .18s;border-radius:14px;overflow:hidden;background:#110F17;">
-          <img loading="lazy" decoding="async" src="uploads/web/DSC07412.jpg" alt="Noam Leshem portrait" style="width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
+        <!-- R3: Portrait — full width -->
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .18s,transform .7s ease .18s;grid-column:1/4;border-radius:14px;overflow:hidden;background:#110F17;">
+          <img loading="lazy" decoding="async" src="uploads/web/DSC07412.jpg" alt="Noam Leshem portrait" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
         </div>
-        <!-- R4: Hands — full width, biggest -->
+        <!-- R4: Editorial — full width -->
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .26s,transform .7s ease .26s;grid-column:1/4;border-radius:14px;overflow:hidden;background:#110F17;">
           <img loading="lazy" decoding="async" src="uploads/web/IMG_6277.jpg" alt="Noam Leshem editorial portrait" style="width:100%;height:100%;object-fit:cover;object-position:center 35%;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
         </div>
