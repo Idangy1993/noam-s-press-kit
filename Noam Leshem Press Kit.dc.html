@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<style>
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;scroll-padding-top:68px;}
+  body{margin:0;background:#08070C;-webkit-font-smoothing:antialiased;}
+  ::selection{background:#FF1E8C;color:#08070C;}
+  @keyframes scrollcue{0%{transform:translateY(0);opacity:.9;}50%{transform:translateY(8px);opacity:.3;}100%{transform:translateY(0);opacity:.9;}}
+  @keyframes dockIn{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
+  @keyframes marquee-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes marquee-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+  /* floating dock — desktop: right side pill */
+  .float-dock{
+    position:fixed;right:18px;top:50%;transform:translateY(-50%);
+    z-index:80;display:flex;flex-direction:column;align-items:center;gap:6px;
+    background:rgba(17,15,23,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:10px 8px;
+    animation:dockIn .6s cubic-bezier(.22,.61,.36,1) .4s both;
+  }
+  .float-dock a{
+    width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+    border-radius:999px;color:rgba(244,242,248,.7);font-size:16px;text-decoration:none;
+    transition:background .2s,color .2s,transform .15s;
+  }
+  .float-dock a:hover{background:var(--pink,#FF1E8C);color:#08070C;transform:scale(1.12);}
+  .float-dock .dock-cta{color:var(--pink,#FF1E8C);}
+  .float-dock .dock-cta:hover{background:var(--pink,#FF1E8C);color:#08070C;}
+  .float-dock .dock-line{width:1px;height:16px;background:rgba(255,255,255,.12);margin:2px 0;}
+
+  /* mobile overrides */
+  @media (max-width:860px){
+    .nav-links{display:none !important;}
+    .two-col{grid-template-columns:1fr !important;}
+    .bio-col{grid-template-columns:1fr !important;}
+    .facts-row{grid-template-columns:1fr !important;}
+
+    /* dock stays right-side pill on mobile, just tighter */
+    .float-dock{
+      right:10px;
+      padding:8px 6px;
+      gap:4px;
+    }
+    .float-dock a{width:34px;height:34px;font-size:15px;}
+    .float-dock .dock-line{height:12px;}
+    .photo-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;grid-template-rows:auto !important;}
+    .shows-grid{grid-template-columns:1fr !important;}
+    .photo-grid > div{grid-column:auto !important;grid-row:auto !important;aspect-ratio:4/3;}
+    .photo-grid > div:first-child,.photo-grid > div:last-child{grid-column:1 / 3 !important;aspect-ratio:16 / 9;}
+  }
+</style>
+</helmet>
+<div ref="{{ rootRef }}" id="top" style="font-family:'Space Grotesk',system-ui,sans-serif;color:#F4F2F8;background:#08070C;overflow-x:hidden;position:relative;">
+
+  <!-- grain / atmosphere -->
+  <div style="position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22140%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.045%22/></svg>');"></div>
+
+  <!-- floating social dock -->
+  <div class="float-dock">
+    <a href="https://www.instagram.com/noamleshem" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+    <a href="https://soundcloud.com/noam-leshem" target="_blank" aria-label="SoundCloud"><i class="fa-brands fa-soundcloud"></i></a>
+    <div class="dock-line"></div>
+    <a href="#contact" class="dock-cta" aria-label="Booking"><i class="fa-solid fa-envelope"></i></a>
+  </div>
+
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px clamp(20px,5vw,52px);background:rgba(8,7,12,.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07);">
+    <a href="#top" style="font-family:Unbounded;font-weight:800;font-size:15px;letter-spacing:.02em;color:#F4F2F8;text-decoration:none;">NOAM LESHEM</a>
+    <div style="display:flex;align-items:center;gap:24px;">
+      <div class="nav-links" style="display:flex;gap:24px;align-items:center;">
+        <a href="#bio" style="font-family:'Space Grotesk';font-weight:500;font-size:13px;letter-spacing:.02em;color:rgba(244,242,248,.66);text-decoration:none;" style-hover="color:var(--pink,#FF1E8C);">Bio</a>
+        <a href="#music" style="font-family:'Space Grotesk';font-weight:500;font-size:13px;letter-spacing:.02em;color:rgba(244,242,248,.66);text-decoration:none;" style-hover="color:var(--pink,#FF1E8C);">Music</a>
+        <a href="#shows" style="font-family:'Space Grotesk';font-weight:500;font-size:13px;letter-spacing:.02em;color:rgba(244,242,248,.66);text-decoration:none;" style-hover="color:var(--pink,#FF1E8C);">Shows</a>
+        <a href="#video" style="font-family:'Space Grotesk';font-weight:500;font-size:13px;letter-spacing:.02em;color:rgba(244,242,248,.66);text-decoration:none;" style-hover="color:var(--pink,#FF1E8C);">Video</a>
+        <a href="#photos" style="font-family:'Space Grotesk';font-weight:500;font-size:13px;letter-spacing:.02em;color:rgba(244,242,248,.66);text-decoration:none;" style-hover="color:var(--pink,#FF1E8C);">Photos</a>
+        <a href="#rider" style="font-family:'Space Grotesk';font-weight:500;font-size:13px;letter-spacing:.02em;color:rgba(244,242,248,.66);text-decoration:none;" style-hover="color:var(--pink,#FF1E8C);">Rider</a>
+      </div>
+      <a href="#contact" style="font-family:'Space Grotesk';font-weight:600;font-size:13px;letter-spacing:.02em;color:#08070C;background:var(--lime,#C8FF00);text-decoration:none;padding:8px 15px;border-radius:999px;white-space:nowrap;" style-hover="background:var(--pink,#FF1E8C);color:#F4F2F8;">Contact</a>
+    </div>
+  </nav>
+
+  <!-- ============ HERO ============ -->
+  <header style="position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(96px,12vh,150px) clamp(22px,5vw,72px) clamp(40px,6vh,68px);overflow:hidden;z-index:2;">
+    <div style="position:absolute;inset:0;z-index:0;background:#08070C;overflow:hidden;">
+      <video id="heroVid" muted loop playsinline poster="uploads/web/IMG_9426.JPG" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.85;filter:saturate(.8) brightness(.9);"><source src="uploads/NoamLeshem1.mp4" type="video/mp4"></video>
+    </div>
+    <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(180deg, rgba(8,7,12,.35) 0%, rgba(8,7,12,.08) 28%, rgba(8,7,12,.55) 70%, rgba(8,7,12,.97) 100%);"></div>
+    <div style="position:relative;z-index:4;max-width:1180px;width:100%;margin:0 auto;">
+      <div style="display:inline-flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:600;font-size:clamp(11px,1.3vw,13px);letter-spacing:.26em;text-transform:uppercase;color:var(--lime,#C8FF00);">
+        <span id="bpmDot" style="width:7px;height:7px;border-radius:999px;background:var(--lime,#C8FF00);box-shadow:0 0 14px var(--lime,#C8FF00);display:inline-block;"></span> DJ &amp; Producer · Psytrance · Deep Techno · Electronic
+      </div>
+      <h1 id="heroName" style="font-family:Unbounded;font-weight:800;font-size:clamp(52px,12vw,148px);line-height:.92;letter-spacing:-.02em;color:#F7F4FB;margin:16px 0 0;">NOAM<br>LESHEM</h1>
+      <p style="font-family:'Space Grotesk';font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(244,242,248,.38);margin:32px 0 0;">↓</p>
+    </div>
+  </header>
+
+  <!-- ============ AT A GLANCE ============ -->
+  <section style="position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(34px,4vw,48px) clamp(22px,5vw,72px);">
+      <div class="facts-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:26px 22px;">
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;">
+          <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.45);">Based in</div>
+          <div style="font-family:Unbounded;font-weight:700;font-size:16px;margin-top:9px;color:#F4F2F8;">Tel Aviv, IL</div>
+        </div>
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .06s,transform .7s ease .06s;">
+          <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.45);">Sound</div>
+          <div style="font-family:Unbounded;font-weight:700;font-size:16px;margin-top:9px;color:#F4F2F8;">Psytrance · Deep Techno</div>
+        </div>
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .12s,transform .7s ease .12s;">
+          <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.45);">Format</div>
+          <div style="font-family:Unbounded;font-weight:700;font-size:16px;margin-top:9px;color:#F4F2F8;">Club · Festival · Sunrise</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BIO ============ -->
+  <section id="bio" style="position:relative;z-index:2;">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(22px,5vw,72px);">
+      <div class="bio-col" style="display:grid;grid-template-columns:0.34fr 0.66fr;gap:clamp(28px,4vw,60px);align-items:start;">
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;">
+          <div style="border-radius:12px;overflow:hidden;margin-bottom:28px;aspect-ratio:3/4;background:#110F17;">
+            <img loading="lazy" decoding="async" src="uploads/web/14006689-41B5-4071-B080-11E1BA8EC597.jpg" alt="Noam Leshem" style="width:100%;height:100%;object-fit:cover;object-position:center top;">
+          </div>
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink,#FF1E8C);">01 / Biography</div>
+          <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(30px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:16px 0 0;">No barrier between her and the dancefloor.</h2>
+        </div>
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .08s,transform .7s ease .08s;max-width:660px;">
+          <p style="font-family:'Space Grotesk';font-weight:400;font-size:clamp(16px,1.7vw,19px);line-height:1.7;color:rgba(244,242,248,.82);margin:0 0 22px;">Noam Leshem is a Tel Aviv-based DJ and producer whose sets move between <span style="color:var(--lime,#C8FF00);">psychedelic psytrance, deep techno, and electronic grooves</span>. She started as a singer · music has been her first language since childhood · and that background shapes the way she builds a set: not track by track, but as one continuous arc.</p>
+          <p style="font-family:'Space Grotesk';font-weight:400;font-size:clamp(16px,1.7vw,19px);line-height:1.7;color:rgba(244,242,248,.82);margin:0 0 22px;">She came up through the Tel Aviv electronic scene, producing alongside T-Paus, Sharon Atar, and Guy Davidov. Over time the heavier, more psychedelic end of the spectrum started pulling her in, and she followed it. That path took her to some of the biggest stages in the local and international scene: Midburn, Burning Man, IMAGiNE, Hilltop, Darwish Land, Boom, River Riders, and Deco. And beyond Israel to the US, India, Thailand, Greece, Portugal, and the UAE.</p>
+          <p style="font-family:'Space Grotesk';font-weight:400;font-size:clamp(16px,1.7vw,19px);line-height:1.7;color:rgba(244,242,248,.82);margin:0;">In the last year she has been sharing stages with leading psytrance artists including Dekel, Shaiman, and Racing Dust, with a standout performance at Hilltop in Goa.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MUSIC / RELEASES ============ -->
+  <section id="music" style="position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.08);">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(22px,5vw,72px);">
+      <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;margin-bottom:38px;">
+        <div style="font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink,#FF1E8C);">02 / Music</div>
+        <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(30px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:14px 0 0;">Releases &amp; sets</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;">
+
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(255,30,140,.55);">
+          <div style="border-radius:11px;overflow:hidden;"><iframe width="100%" height="220" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/noam-leshem/imagine-festival&color=%23FF1E8C&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true" style="display:block;"></iframe></div>
+          <div>
+            <div style="font-family:Unbounded;font-weight:700;font-size:17px;color:#F4F2F8;">IMAGiNE Festival 2025</div>
+            <div style="font-family:'Space Grotesk';font-size:13px;color:rgba(244,242,248,.5);margin-top:4px;">Live set · Oct 2025</div>
+          </div>
+          <a href="https://soundcloud.com/noam-leshem/imagine-festival" target="_blank" style="display:inline-flex;align-items:center;gap:8px;color:var(--pink,#FF1E8C);font-family:'Space Grotesk';font-weight:600;font-size:13px;text-decoration:none;" style-hover="color:var(--lime,#C8FF00);"><i class="fa-brands fa-soundcloud"></i> Listen on SoundCloud</a>
+        </div>
+
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .08s,transform .7s ease .08s;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(200,255,0,.5);">
+          <div style="border-radius:11px;overflow:hidden;"><iframe width="100%" height="220" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/noam-leshem/noam-leshem-psy-trance-set&color=%23C8FF00&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true" style="display:block;"></iframe></div>
+          <div>
+            <div style="font-family:Unbounded;font-weight:700;font-size:17px;color:#F4F2F8;">PSY TRANCE Set</div>
+            <div style="font-family:'Space Grotesk';font-size:13px;color:rgba(244,242,248,.5);margin-top:4px;">Studio set · Oct 2024</div>
+          </div>
+          <a href="https://soundcloud.com/noam-leshem/noam-leshem-psy-trance-set" target="_blank" style="display:inline-flex;align-items:center;gap:8px;color:var(--pink,#FF1E8C);font-family:'Space Grotesk';font-weight:600;font-size:13px;text-decoration:none;" style-hover="color:var(--lime,#C8FF00);"><i class="fa-brands fa-soundcloud"></i> Listen on SoundCloud</a>
+        </div>
+
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .16s,transform .7s ease .16s;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(255,30,140,.55);">
+          <div style="border-radius:11px;overflow:hidden;"><iframe width="100%" height="220" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/noam-leshem/sunrise-magic-ecstatica-camp-midburn&color=%23FF1E8C&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true" style="display:block;"></iframe></div>
+          <div>
+            <div style="font-family:Unbounded;font-weight:700;font-size:17px;color:#F4F2F8;">Sunrise Magic at Midburn</div>
+            <div style="font-family:'Space Grotesk';font-size:13px;color:rgba(244,242,248,.5);margin-top:4px;">Live set · Ecstatica Camp · Jun 2024</div>
+          </div>
+          <a href="https://soundcloud.com/noam-leshem/sunrise-magic-ecstatica-camp-midburn" target="_blank" style="display:inline-flex;align-items:center;gap:8px;color:var(--pink,#FF1E8C);font-family:'Space Grotesk';font-weight:600;font-size:13px;text-decoration:none;" style-hover="color:var(--lime,#C8FF00);"><i class="fa-brands fa-soundcloud"></i> Listen on SoundCloud</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SHOWS ============ -->
+  <section id="shows" style="position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.08);">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(22px,5vw,72px);">
+      <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;margin-bottom:clamp(36px,5vw,56px);">
+        <div style="font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink,#FF1E8C);">03 / Stages</div>
+        <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(30px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:14px 0 0;">The circuit</h2>
+      </div>
+
+      <div class="shows-grid" style="display:grid;grid-template-columns:0.44fr 0.56fr;gap:clamp(36px,5vw,72px);align-items:start;">
+
+        <!-- Left: festival list -->
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .06s,transform .7s ease .06s;">
+          <div style="font-family:'Space Grotesk';font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,242,248,.28);margin-bottom:8px;">Festivals</div>
+          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Midburn</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Israel</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Burning Man</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Nevada, US</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">IMAGiNE Festival</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Israel</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Hilltop</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Goa, India</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Darwish Land</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Israel</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Boom Festival</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Portugal</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">River Riders Festival</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Portugal</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 0;"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Deco Festival</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Israel</span></div>
+        </div>
+
+        <!-- Right: world map canvas -->
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .12s,transform .7s ease .12s;">
+          <div style="border-radius:14px;overflow:hidden;background:#0C0A13;border:1px solid rgba(255,255,255,.07);">
+            <canvas id="worldMap" style="width:100%;display:block;aspect-ratio:2/1;"></canvas>
+          </div>
+          <p style="font-family:'Space Grotesk';font-size:11px;color:rgba(244,242,248,.22);letter-spacing:.06em;margin:10px 0 0;text-align:right;">Israel · US · India · Thailand · Greece · UAE · Portugal</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIDEO ============ -->
+  <section id="video" style="position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.08);">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(22px,5vw,72px);">
+      <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;margin-bottom:30px;">
+        <div style="font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink,#FF1E8C);">04 / Live</div>
+        <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(30px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:14px 0 0;">Live &amp; reels</h2>
+      </div>
+      <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .08s,transform .7s ease .08s;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;align-items:start;">
+
+        <!-- Card 1: Reel -->
+        <a href="https://www.instagram.com/reel/DFC5KsANEGI/" target="_blank" rel="noopener" style="display:block;text-decoration:none;border-radius:16px;overflow:hidden;background:#110F17;border:1px solid rgba(255,255,255,.08);position:relative;aspect-ratio:4/5;cursor:pointer;" style-hover="border-color:rgba(255,30,140,.5);">
+          <img loading="lazy" decoding="async" src="uploads/web/DSC08876.jpeg" alt="Noam Leshem reel" style="width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block;transition:transform .5s ease;" style-hover="transform:scale(1.04);">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,7,12,.85) 0%,rgba(8,7,12,.1) 55%,transparent 100%);"></div>
+          <div style="position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:6px;background:rgba(8,7,12,.7);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:5px 11px;">
+            <i class="fa-brands fa-instagram" style="font-size:12px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></i>
+            <span style="font-family:'Space Grotesk';font-size:11px;font-weight:600;letter-spacing:.08em;color:#F4F2F8;">REEL</span>
+          </div>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;background:rgba(255,30,140,.85);display:flex;align-items:center;justify-content:center;box-shadow:0 0 28px rgba(255,30,140,.5);">
+            <i class="fa-solid fa-play" style="font-size:18px;color:#fff;margin-left:3px;"></i>
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:20px;">
+            <div style="font-family:'Space Grotesk';font-size:13px;font-weight:600;color:#F4F2F8;letter-spacing:.01em;">Live set · w/ Kaling</div>
+            <div style="font-family:'Space Grotesk';font-size:11px;color:rgba(244,242,248,.5);margin-top:3px;">Watch on Instagram ↗</div>
+          </div>
+        </a>
+
+        <!-- Card 2: Post -->
+        <a href="https://www.instagram.com/p/DDEijHatNgj/" target="_blank" rel="noopener" style="display:block;text-decoration:none;border-radius:16px;overflow:hidden;background:#110F17;border:1px solid rgba(255,255,255,.08);position:relative;aspect-ratio:4/5;cursor:pointer;" style-hover="border-color:rgba(255,30,140,.5);">
+          <img loading="lazy" decoding="async" src="uploads/web/IMG_9426.JPG" alt="HillTop Goa" style="width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;transition:transform .5s ease;" style-hover="transform:scale(1.04);">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,7,12,.85) 0%,rgba(8,7,12,.1) 55%,transparent 100%);"></div>
+          <div style="position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:6px;background:rgba(8,7,12,.7);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:5px 11px;">
+            <i class="fa-brands fa-instagram" style="font-size:12px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></i>
+            <span style="font-family:'Space Grotesk';font-size:11px;font-weight:600;letter-spacing:.08em;color:#F4F2F8;">POST</span>
+          </div>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.3);">
+            <i class="fa-brands fa-instagram" style="font-size:22px;color:#fff;"></i>
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:20px;">
+            <div style="font-family:'Space Grotesk';font-size:13px;font-weight:600;color:#F4F2F8;letter-spacing:.01em;">Imagine Festival 2024</div>
+            <div style="font-family:'Space Grotesk';font-size:11px;color:rgba(244,242,248,.5);margin-top:3px;">View on Instagram ↗</div>
+          </div>
+        </a>
+
+        <!-- Card 3: Post -->
+        <a href="https://www.instagram.com/p/DSh9ibiCBxu/" target="_blank" rel="noopener" style="display:block;text-decoration:none;border-radius:16px;overflow:hidden;background:#110F17;border:1px solid rgba(255,255,255,.08);position:relative;aspect-ratio:4/5;cursor:pointer;" style-hover="border-color:rgba(255,30,140,.5);">
+          <img loading="lazy" decoding="async" src="uploads/web/DSC07602.jpg" alt="Noam Leshem DJ" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease;" style-hover="transform:scale(1.04);">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,7,12,.85) 0%,rgba(8,7,12,.1) 55%,transparent 100%);"></div>
+          <div style="position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:6px;background:rgba(8,7,12,.7);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:5px 11px;">
+            <i class="fa-brands fa-instagram" style="font-size:12px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></i>
+            <span style="font-family:'Space Grotesk';font-size:11px;font-weight:600;letter-spacing:.08em;color:#F4F2F8;">POST</span>
+          </div>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.3);">
+            <i class="fa-brands fa-instagram" style="font-size:22px;color:#fff;"></i>
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:20px;">
+            <div style="font-family:'Space Grotesk';font-size:13px;font-weight:600;color:#F4F2F8;letter-spacing:.01em;">@noamleshem</div>
+            <div style="font-family:'Space Grotesk';font-size:11px;color:rgba(244,242,248,.5);margin-top:3px;">View on Instagram ↗</div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PHOTOS ============ -->
+  <section id="photos" style="position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.08);">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(22px,5vw,72px);">
+      <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;margin-bottom:30px;">
+        <div style="font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink,#FF1E8C);">05 / Photos</div>
+        <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(30px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:14px 0 0;">Press photos</h2>
+      </div>
+      <div class="photo-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:320px 320px 300px 360px;gap:10px;">
+        <!-- R1: B&W small | Color wide -->
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;border-radius:14px;overflow:hidden;background:#110F17;">
+          <img loading="lazy" decoding="async" src="uploads/web/9242b075-9c4b-4edb-9b5c-c3da94edc771.JPG" alt="Noam Leshem live behind the decks" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
+        </div>
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .06s,transform .7s ease .06s;grid-column:2/4;border-radius:14px;overflow:hidden;background:#110F17;">
+          <img loading="lazy" decoding="async" src="uploads/web/DSC08876.jpeg" alt="Noam Leshem live" style="width:100%;height:100%;object-fit:cover;object-position:center 25%;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
+        </div>
+        <!-- R2: B&W wide | Color small -->
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .1s,transform .7s ease .1s;grid-column:1/3;border-radius:14px;overflow:hidden;background:#110F17;">
+          <img loading="lazy" decoding="async" src="uploads/web/000040940012-bw.jpg" alt="Noam Leshem" style="width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
+        </div>
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .14s,transform .7s ease .14s;border-radius:14px;overflow:hidden;background:#110F17;">
+          <img loading="lazy" decoding="async" src="uploads/web/IMG_6952.jpg" alt="Noam Leshem" style="width:100%;height:100%;object-fit:cover;object-position:center 20%;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
+        </div>
+        <!-- R3: B&W small | B&W wide (different sizes = ok) -->
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .18s,transform .7s ease .18s;border-radius:14px;overflow:hidden;background:#110F17;">
+          <img loading="lazy" decoding="async" src="uploads/web/DSC07412.jpg" alt="Noam Leshem portrait" style="width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
+        </div>
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .22s,transform .7s ease .22s;grid-column:2/4;border-radius:14px;overflow:hidden;background:#110F17;">
+          <img loading="lazy" decoding="async" src="uploads/web/000040950002-bw.jpg" alt="Noam Leshem editorial" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
+        </div>
+        <!-- R4: Hands — full width, biggest -->
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .26s,transform .7s ease .26s;grid-column:1/4;border-radius:14px;overflow:hidden;background:#110F17;">
+          <img loading="lazy" decoding="async" src="uploads/web/IMG_6277.jpg" alt="Noam Leshem editorial portrait" style="width:100%;height:100%;object-fit:cover;object-position:center 35%;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
+        </div>
+      </div>
+      <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .22s,transform .7s ease .22s;margin-top:18px;">
+        <p style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.32);letter-spacing:.04em;margin:0 0 12px;">Photos © Eliad Golan &amp; press archive &middot; For editorial use, credit required</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <a href="uploads/9242b075-9c4b-4edb-9b5c-c3da94edc771.JPG" download="noam-leshem-live-bw.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Live — B&amp;W</a>
+          <a href="uploads/IMG_9426.JPG" download="noam-leshem-live-imagine.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Live — Imagine</a>
+          <a href="uploads/DSC08876.jpeg" download="noam-leshem-live-festival.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Live — Festival</a>
+          <a href="uploads/000040940012-bw.jpg" download="noam-leshem-bw-editorial.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> B&amp;W Editorial</a>
+          <a href="uploads/14006689-41B5-4071-B080-11E1BA8EC597.jpg" download="noam-leshem-portrait-bw.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Portrait B&amp;W</a>
+          <a href="uploads/000040950002-bw.jpg" download="noam-leshem-editorial-bw-2.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Editorial B&amp;W II</a>
+          <a href="uploads/DSC07412.jpg" download="noam-leshem-portrait-studio.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Portrait Studio</a>
+          <a href="uploads/IMG_6277.jpg" download="noam-leshem-editorial-portrait.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Editorial Portrait</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============ TECH RIDER ============ -->
+  <section id="rider" style="position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.08);">
+    <div style="max-width:1180px;margin:0 auto;padding:clamp(32px,3.5vw,48px) clamp(22px,5vw,72px);">
+      <div class="bio-col" style="display:grid;grid-template-columns:0.34fr 0.66fr;gap:clamp(20px,3vw,48px);align-items:center;">
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;">
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink,#FF1E8C);">06 / Technical</div>
+          <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(22px,3vw,36px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:10px 0 8px;">Tech rider</h2>
+          <p style="font-family:'Space Grotesk';font-size:13px;line-height:1.5;color:rgba(244,242,248,.5);max-width:260px;margin:0;">Standard Pioneer booth. Full rider on request.</p>
+        </div>
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .08s,transform .7s ease .08s;font-family:'Space Grotesk';font-size:13px;color:#F4F2F8;border-top:1px solid rgba(255,255,255,.12);">
+          <div style="display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);"><span>Pioneer CDJ-3000 players</span><span style="color:var(--pink,#FF1E8C);font-weight:600;">×3</span></div>
+          <div style="display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);"><span>Pioneer DJM-A9 / 900NXS2 mixer</span><span style="color:var(--pink,#FF1E8C);font-weight:600;">×1</span></div>
+          <div style="display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);"><span>Booth monitors (Funktion-One / Pioneer)</span><span style="color:var(--pink,#FF1E8C);font-weight:600;">×2</span></div>
+          <div style="display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);"><span>Wired mic (Shure SM58)</span><span style="color:var(--pink,#FF1E8C);font-weight:600;">×1</span></div>
+          <div style="display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);"><span>Sturdy lit booth table, hip height</span><span style="color:var(--pink,#FF1E8C);font-weight:600;">×1</span></div>
+          <div style="display:flex;justify-content:space-between;gap:16px;padding:7px 0;"><span>Power &amp; clean monitoring at the booth</span><span style="color:var(--pink,#FF1E8C);font-weight:600;">—</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" style="position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.08);overflow:hidden;padding-bottom:env(safe-area-inset-bottom);">
+    <div style="position:absolute;left:50%;top:-40%;transform:translateX(-50%);width:70vw;height:60vw;z-index:0;background:radial-gradient(circle, rgba(255,30,140,.22) 0%, transparent 60%);filter:blur(50px);pointer-events:none;"></div>
+    <div style="position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(22px,5vw,72px) clamp(40px,5vw,56px);">
+      <div class="bio-col" style="display:grid;grid-template-columns:0.34fr 0.66fr;gap:clamp(28px,4vw,60px);align-items:start;">
+
+        <!-- left: label -->
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;">
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--lime,#C8FF00);">07 / Booking</div>
+          <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(30px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:16px 0 0;">Get in touch.</h2>
+        </div>
+
+        <!-- right: contact info -->
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .08s,transform .7s ease .08s;">
+
+          <!-- booking agent row -->
+          <div style="border-top:1px solid rgba(255,255,255,.12);padding:22px 0;">
+            <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.4);margin-bottom:8px;">Booking agent</div>
+            <div style="font-family:Unbounded;font-weight:700;font-size:clamp(18px,2vw,24px);color:#F4F2F8;margin-bottom:10px;">Alteza</div>
+            <a href="mailto:Dima@fantastic-management.com" style="font-family:'Space Grotesk';font-weight:500;font-size:clamp(14px,1.4vw,17px);color:var(--pink,#FF1E8C);text-decoration:none;letter-spacing:.01em;" style-hover="color:var(--lime,#C8FF00);">Dima@fantastic-management.com</a>
+          </div>
+
+          <!-- socials row -->
+          <div style="border-top:1px solid rgba(255,255,255,.08);padding:22px 0 0;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+            <div>
+              <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.4);margin-bottom:12px;">Socials</div>
+              <div style="display:flex;gap:8px;">
+                <a href="https://www.instagram.com/noamleshem" target="_blank" aria-label="Instagram" style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:rgba(244,242,248,.7);font-size:16px;text-decoration:none;" style-hover="background:var(--pink,#FF1E8C);color:#08070C;border-color:var(--pink,#FF1E8C);"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://soundcloud.com/noam-leshem" target="_blank" aria-label="SoundCloud" style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.14);border-radius:10px;color:rgba(244,242,248,.7);font-size:16px;text-decoration:none;" style-hover="background:var(--pink,#FF1E8C);color:#08070C;border-color:var(--pink,#FF1E8C);"><i class="fa-brands fa-soundcloud"></i></a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-top:48px;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);">
+        <div style="font-family:Unbounded;font-weight:800;font-size:15px;color:#F4F2F8;">NOAM LESHEM</div>
+        <div style="font-family:'Space Grotesk';font-size:11.5px;letter-spacing:.05em;color:rgba(244,242,248,.4);">EPK 2026 · All bookings via Alteza · Dima@fantastic-management.com</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;pink&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#FF1E8C&quot;, &quot;tsType&quot;: &quot;string&quot;},
+  &quot;lime&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#C8FF00&quot;, &quot;tsType&quot;: &quot;string&quot;},
+  &quot;neonGlow&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;}
+}">
+class Component extends DCLogic {
+  componentDidMount() {
+    const root = this.root;
+    if (!root) return;
+
+    // Remove any leftover particle canvas from previous renders
+    document.querySelectorAll('canvas').forEach(c => { if (c.style.mixBlendMode === 'screen') c.remove(); });
+
+    // Video
+    const vid = root.querySelector('#heroVid');
+    if (vid) {
+      vid.muted = true; vid.loop = true;
+      vid.play().catch(() => {
+        const r = () => { vid.play(); document.removeEventListener('click',r); document.removeEventListener('touchstart',r); };
+        document.addEventListener('click', r);
+        document.addEventListener('touchstart', r);
+      });
+      vid.addEventListener('ended', () => { vid.currentTime = 0; vid.play(); });
+    }
+
+    if (this.props.pink) root.style.setProperty('--pink', this.props.pink);
+    if (this.props.lime) root.style.setProperty('--lime', this.props.lime);
+
+    if (this.props.neonGlow !== false) {
+      const name = root.querySelector('#heroName');
+      if (name) name.style.textShadow = '0 0 18px rgba(255,30,140,.22), 0 0 42px rgba(255,30,140,.09)';
+    }
+
+    const revObs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'none';
+          revObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    root.querySelectorAll('[data-reveal]').forEach((el) => revObs.observe(el));
+
+    this.initBPMPulse();
+    this.initWorldMap();
+    setTimeout(() => {
+      if (window.instgrm) {
+        window.instgrm.Embeds.process();
+      } else {
+        const s = document.createElement('script');
+        s.src = 'https://www.instagram.com/embed.js';
+        s.async = true;
+        s.onload = () => { if (window.instgrm) window.instgrm.Embeds.process(); };
+        document.body.appendChild(s);
+      }
+    }, 600);
+  }
+
+  initParticles() {
+    const isMobile = window.innerWidth < 760;
+    const count = isMobile ? 50 : 100;
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;inset:0;z-index:50;pointer-events:none;mix-blend-mode:screen;';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; });
+
+    let mx = W / 2, my = H * 0.4;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    document.addEventListener('touchmove', e => { mx = e.touches[0].clientX; my = e.touches[0].clientY; }, { passive: true });
+
+    const BPM = 145, beatMs = 60000 / BPM;
+    const particles = Array.from({ length: count }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      r: Math.random() * 1.0 + 0.3,
+      pink: Math.random() > 0.42,
+      base: Math.random() * 0.06 + 0.03,
+    }));
+
+    const tick = now => {
+      const beatPhase = (now % beatMs) / beatMs;
+      const pulse = Math.max(0, Math.sin(beatPhase * Math.PI * 2));
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => {
+        const dx = mx - p.x, dy = my - p.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 200 && dist > 0) {
+          const f = (200 - dist) / 200 * 0.016;
+          p.vx += dx / dist * f; p.vy += dy / dist * f;
+        }
+        p.vx *= 0.975; p.vy *= 0.975;
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+        const alpha = p.base * (0.6 + pulse * 0.4);
+        const rad = p.r * (0.8 + pulse * 0.25);
+        const bloom = rad * 9;
+        const [r, g, b] = p.pink ? [255, 30, 140] : [200, 255, 0];
+        const g2 = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, bloom);
+        g2.addColorStop(0, `rgba(${r},${g},${b},${(alpha * 1.4).toFixed(3)})`);
+        g2.addColorStop(0.4, `rgba(${r},${g},${b},${alpha.toFixed(3)})`);
+        g2.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        ctx.fillStyle = g2;
+        ctx.beginPath(); ctx.arc(p.x, p.y, bloom, 0, Math.PI * 2); ctx.fill();
+      });
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  initGlitch() {
+    const el = this.root && this.root.querySelector('#heroName');
+    if (!el) return;
+    const baseGlow = '0 0 42px rgba(255,30,140,.55), 0 0 90px rgba(255,30,140,.3)';
+    const glitch = () => {
+      const seq = [
+        [0,   'translateX(-2px) skewX(-3deg)', '-3px 0 rgba(255,30,140,.6), 3px 0 rgba(200,255,0,.45)'],
+        [55,  'translateX(2px)',                '3px 0 rgba(200,255,0,.5), -2px 0 rgba(255,30,140,.4)'],
+        [100, '',                               baseGlow],
+      ];
+      seq.forEach(([t, transform, shadow]) => {
+        setTimeout(() => { el.style.transform = transform; el.style.textShadow = shadow; }, t);
+      });
+      setTimeout(glitch, 4000 + Math.random() * 7000);
+    };
+    setTimeout(glitch, 3000 + Math.random() * 4000);
+  }
+
+  initBPMPulse() {
+    const dot = this.root && this.root.querySelector('#bpmDot');
+    if (!dot) return;
+    const BPM = 145, beatMs = 60000 / BPM;
+    const tick = now => {
+      const p = (now % beatMs) / beatMs;
+      const v = Math.max(0, Math.sin(p * Math.PI * 2));
+      dot.style.transform = `scale(${(1 + v * 0.45).toFixed(3)})`;
+      dot.style.boxShadow = `0 0 ${(6 + v * 8).toFixed(1)}px var(--lime,#C8FF00)`;
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  async initWorldMap() {
+    const canvas = this.root && this.root.querySelector('#worldMap');
+    if (!canvas) return;
+
+    // Wait for topojson CDN script
+    let attempts = 0;
+    while (!window.topojson && attempts < 30) {
+      await new Promise(r => setTimeout(r, 100));
+      attempts++;
+    }
+    if (!window.topojson) return;
+
+    try {
+      this._worldTopo = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
+    } catch(e) { return; }
+
+    const draw = () => {
+      const W = canvas.offsetWidth;
+      const H = canvas.offsetHeight || (canvas.offsetWidth / 2);
+      if (!W || !H) { setTimeout(draw, 100); return; }
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      this._drawMap(ctx, W, H);
+    };
+
+    draw();
+    window.addEventListener('resize', () => { clearTimeout(this._mapResizeTimer); this._mapResizeTimer = setTimeout(draw, 80); });
+  }
+
+  _drawMap(ctx, W, H) {
+    const LAT_MAX = 78, LAT_MIN = -56;
+    const project = (lon, lat) => [
+      (lon + 180) / 360 * W,
+      (LAT_MAX - lat) / (LAT_MAX - LAT_MIN) * H
+    ];
+
+    // ISO numeric IDs: Israel, USA, India, Thailand, Greece, UAE, Portugal
+    const highlighted = new Set([376, 840, 356, 764, 300, 784, 620]);
+
+    ctx.fillStyle = '#0C0A13';
+    ctx.fillRect(0, 0, W, H);
+
+    const countries = window.topojson.feature(this._worldTopo, this._worldTopo.objects.countries);
+    countries.features.forEach(f => {
+      const id = parseInt(f.id);
+      ctx.beginPath();
+      this._geoPath(ctx, f.geometry, project);
+      if (highlighted.has(id)) {
+        ctx.fillStyle = 'rgba(255,30,140,.2)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,30,140,.5)';
+        ctx.lineWidth = 0.8;
+      } else {
+        ctx.fillStyle = '#18152A';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.07)';
+        ctx.lineWidth = 0.3;
+      }
+      ctx.stroke();
+    });
+
+    // [label, lon, lat, labelDy] — labelDy>0 draws label below the dot to avoid collisions
+    const locs = [
+      ['Tel Aviv',    34.78,  32.07, -12],
+      ['Hawaii',    -157.8,   21.3,  -12],
+      ['Los Angeles', -118.2,  34.05,  16],
+      ['Goa',         73.83,  15.5,  -12],
+      ['Thailand',   100.5,   13.75, -12],
+      ['Greece',      23.7,   37.98, -12],
+      ['Crete',       25.0,   35.3,   16],
+      ['Portugal',    -8.2,   39.4,  -12],
+      ['Dubai',       55.3,   25.2,  -12],
+    ];
+
+    locs.forEach(([label, lon, lat, labelDy]) => {
+      const [x, y] = project(lon, lat);
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, 20);
+      glow.addColorStop(0, 'rgba(255,30,140,.5)');
+      glow.addColorStop(1, 'rgba(255,30,140,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#FF1E8C';
+      ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.55)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      if (W >= 480) {
+        ctx.fillStyle = 'rgba(244,242,248,.72)';
+        ctx.font = "500 9px 'Space Grotesk', sans-serif";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = labelDy > 0 ? 'top' : 'alphabetic';
+        ctx.fillText(label.toUpperCase(), x, y + labelDy);
+      }
+    });
+  }
+
+  _geoPath(ctx, geometry, project) {
+    if (!geometry) return;
+    const ring = (coords) => {
+      if (!coords || coords.length < 2) return;
+      const [x0, y0] = project(coords[0][0], coords[0][1]);
+      ctx.moveTo(x0, y0);
+      for (let i = 1; i < coords.length; i++) {
+        const [x, y] = project(coords[i][0], coords[i][1]);
+        ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+    };
+    if (geometry.type === 'Polygon') {
+      geometry.coordinates.forEach(ring);
+    } else if (geometry.type === 'MultiPolygon') {
+      geometry.coordinates.forEach(p => p.forEach(ring));
+    }
+  }
+
+  renderVals() {
+    return { rootRef: (el) => { this.root = el; } };
+  }
+}
+</script>
+</body>
+</html>
