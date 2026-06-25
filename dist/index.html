@@ -50,19 +50,29 @@
 
   /* mobile overrides */
   @media (max-width:860px){
+    body{padding-bottom:calc(72px + env(safe-area-inset-bottom));}
     .nav-links{display:none !important;}
     .two-col{grid-template-columns:1fr !important;}
     .bio-col{grid-template-columns:1fr !important;}
-    .facts-row{grid-template-columns:1fr !important;}
+    /* keep the two facts side-by-side — they're compact enough */
+    .facts-row{grid-template-columns:1fr 1fr !important;}
 
-    /* dock stays right-side pill on mobile, just tighter */
+    /* dock: move to bottom center bar on mobile */
     .float-dock{
-      right:10px;
-      padding:8px 6px;
-      gap:4px;
+      right:auto;
+      left:50%;
+      top:auto;
+      bottom:calc(14px + env(safe-area-inset-bottom));
+      transform:translateX(-50%);
+      flex-direction:row;
+      padding:8px 16px;
+      gap:2px;
     }
-    .float-dock a{width:34px;height:34px;font-size:15px;}
-    .float-dock .dock-line{height:12px;}
+    .float-dock a{width:44px;height:44px;font-size:17px;}
+    .float-dock .dock-line{width:1px;height:28px;margin:0 4px;}
+
+    .hero-label{letter-spacing:.07em !important;font-size:10px !important;}
+
     .photo-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;grid-template-rows:auto !important;}
     .shows-grid{grid-template-columns:1fr !important;}
     .photo-grid > div{grid-column:auto !important;grid-row:auto !important;aspect-ratio:4/3;}
@@ -109,7 +119,7 @@
     </div>
     <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(180deg, rgba(8,7,12,.35) 0%, rgba(8,7,12,.08) 28%, rgba(8,7,12,.55) 70%, rgba(8,7,12,.97) 100%);"></div>
     <div style="position:relative;z-index:4;max-width:1180px;width:100%;margin:0 auto;">
-      <div style="display:inline-flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:600;font-size:clamp(11px,1.3vw,13px);letter-spacing:.26em;text-transform:uppercase;color:var(--lime,#C8FF00);">
+      <div class="hero-label" style="display:inline-flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:600;font-size:clamp(11px,1.3vw,13px);letter-spacing:.26em;text-transform:uppercase;color:var(--lime,#C8FF00);">
         <span id="bpmDot" style="width:7px;height:7px;border-radius:999px;background:var(--lime,#C8FF00);box-shadow:0 0 14px var(--lime,#C8FF00);display:inline-block;"></span> DJ &amp; Producer · Psytrance · Deep Techno · Electronic
       </div>
       <h1 id="heroName" style="font-family:Unbounded;font-weight:800;font-size:clamp(52px,12vw,148px);line-height:.92;letter-spacing:-.02em;color:#F7F4FB;margin:16px 0 0;">NOAM<br>LESHEM</h1>
@@ -120,7 +130,7 @@
   <!-- ============ AT A GLANCE ============ -->
   <section style="position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);">
     <div style="max-width:1180px;margin:0 auto;padding:clamp(34px,4vw,48px) clamp(22px,5vw,72px);">
-      <div class="facts-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:26px 22px;">
+      <div class="facts-row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:26px 22px;">
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;">
           <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.45);">Based in</div>
           <div style="font-family:Unbounded;font-weight:700;font-size:16px;margin-top:9px;color:#F4F2F8;">Tel Aviv, IL</div>
@@ -128,10 +138,6 @@
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .06s,transform .7s ease .06s;">
           <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.45);">Sound</div>
           <div style="font-family:Unbounded;font-weight:700;font-size:16px;margin-top:9px;color:#F4F2F8;">Psytrance · Deep Techno</div>
-        </div>
-        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .12s,transform .7s ease .12s;">
-          <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.45);">Format</div>
-          <div style="font-family:Unbounded;font-weight:700;font-size:16px;margin-top:9px;color:#F4F2F8;">Club · Festival · Sunrise</div>
         </div>
       </div>
     </div>
@@ -322,9 +328,6 @@
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .18s,transform .7s ease .18s;border-radius:14px;overflow:hidden;background:#110F17;">
           <img loading="lazy" decoding="async" src="assets/DSC07412.jpg" alt="Noam Leshem portrait" style="width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
         </div>
-        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .22s,transform .7s ease .22s;grid-column:2/4;border-radius:14px;overflow:hidden;background:#110F17;">
-          <img loading="lazy" decoding="async" src="assets/000040950002-bw.jpg" alt="Noam Leshem editorial" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
-        </div>
         <!-- R4: Hands — full width, biggest -->
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .26s,transform .7s ease .26s;grid-column:1/4;border-radius:14px;overflow:hidden;background:#110F17;">
           <img loading="lazy" decoding="async" src="assets/IMG_6277.jpg" alt="Noam Leshem editorial portrait" style="width:100%;height:100%;object-fit:cover;object-position:center 35%;transition:transform .6s ease;" style-hover="transform:scale(1.04);">
@@ -338,7 +341,6 @@
           <a href="downloads/DSC08876.jpeg" download="noam-leshem-live-festival.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Live — Festival</a>
           <a href="downloads/000040940012-bw.jpg" download="noam-leshem-bw-editorial.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> B&amp;W Editorial</a>
           <a href="downloads/14006689-41B5-4071-B080-11E1BA8EC597.jpg" download="noam-leshem-portrait-bw.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Portrait B&amp;W</a>
-          <a href="downloads/000040950002-bw.jpg" download="noam-leshem-editorial-bw-2.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Editorial B&amp;W II</a>
           <a href="downloads/DSC07412.jpg" download="noam-leshem-portrait-studio.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Portrait Studio</a>
           <a href="downloads/IMG_6277.jpg" download="noam-leshem-editorial-portrait.jpg" style="display:inline-flex;align-items:center;gap:6px;background:#110F17;border:1px solid rgba(255,255,255,.12);color:rgba(244,242,248,.65);font-family:'Space Grotesk';font-size:12px;font-weight:500;text-decoration:none;padding:7px 12px;border-radius:8px;" style-hover="border-color:var(--pink,#FF1E8C);color:#F4F2F8;"><i class="fa-solid fa-download" style="font-size:10px;"></i> Editorial Portrait</a>
         </div>
@@ -387,7 +389,7 @@
           <div style="border-top:1px solid rgba(255,255,255,.12);padding:22px 0;">
             <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.4);margin-bottom:8px;">Booking agent</div>
             <div style="font-family:Unbounded;font-weight:700;font-size:clamp(18px,2vw,24px);color:#F4F2F8;margin-bottom:10px;">Alteza</div>
-            <a href="mailto:Dima@fantastic-management.com" style="font-family:'Space Grotesk';font-weight:500;font-size:clamp(14px,1.4vw,17px);color:var(--pink,#FF1E8C);text-decoration:none;letter-spacing:.01em;" style-hover="color:var(--lime,#C8FF00);">Dima@fantastic-management.com</a>
+            <a href="mailto:Dima@fantastic-management.com" style="font-family:'Space Grotesk';font-weight:500;font-size:clamp(14px,1.4vw,17px);color:var(--pink,#FF1E8C);text-decoration:none;letter-spacing:.01em;word-break:break-all;" style-hover="color:var(--lime,#C8FF00);">Dima@fantastic-management.com</a>
           </div>
 
           <!-- socials row -->
@@ -406,7 +408,7 @@
 
       <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-top:48px;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);">
         <div style="font-family:Unbounded;font-weight:800;font-size:15px;color:#F4F2F8;">NOAM LESHEM</div>
-        <div style="font-family:'Space Grotesk';font-size:11.5px;letter-spacing:.05em;color:rgba(244,242,248,.4);">EPK 2026 · All bookings via Alteza · Dima@fantastic-management.com</div>
+        <div style="font-family:'Space Grotesk';font-size:11.5px;letter-spacing:.05em;color:rgba(244,242,248,.4);word-break:break-word;">EPK 2026 · All bookings via Alteza · Dima@fantastic-management.com</div>
       </div>
     </div>
   </section>
