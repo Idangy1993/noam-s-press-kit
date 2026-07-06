@@ -95,6 +95,8 @@
   .lb-overlay.lb-open .lb-img{transform:scale(1);}
   .lb-close{position:absolute;top:18px;right:22px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.1);color:#F4F2F8;font-size:20px;cursor:pointer;border:none;transition:background .2s;}
   .lb-close:hover{background:var(--pink,#FF1E8C);color:#08070C;}
+  .lb-download{position:absolute;top:18px;right:74px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.1);color:#F4F2F8;font-size:17px;text-decoration:none;transition:background .2s;}
+  .lb-download:hover{background:var(--lime,#C8FF00);color:#08070C;}
 
 
 /* ── Reveal fallback if JS is slow ── */
@@ -427,6 +429,7 @@
   <!-- #3 lightbox -->
   <div class="lb-overlay" id="lbOverlay">
     <button class="lb-close" id="lbClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    <a class="lb-download" id="lbDownload" href="#" download aria-label="Download photo"><i class="fa-solid fa-download"></i></a>
     <img class="lb-img" id="lbImg" src="" alt="Press photo">
   </div>
 
@@ -525,6 +528,7 @@ function initLightbox() {
   const overlay = document.getElementById('lbOverlay');
   const img = document.getElementById('lbImg');
   const btn = document.getElementById('lbClose');
+  const dlBtn = document.getElementById('lbDownload');
   if (!overlay || !img) return;
   const grid = root.querySelector('.photo-grid');
   if (grid) {
@@ -532,7 +536,18 @@ function initLightbox() {
       const cell = e.target.closest('[data-reveal]');
       if (!cell) return;
       const pic = cell.querySelector('img');
-      if (pic) { img.src = pic.src; overlay.classList.add('lb-open'); }
+      if (!pic) return;
+      img.src = pic.src;
+      // Point download button at full-quality file
+      if (dlBtn) {
+        const filename = pic.getAttribute('src').split('/').pop().split('?')[0];
+        const dlPath = pic.getAttribute('src').includes('uploads/web/')
+          ? 'uploads/' + filename
+          : 'downloads/' + filename;
+        dlBtn.href = dlPath;
+        dlBtn.setAttribute('download', 'noam-leshem-' + filename.toLowerCase());
+      }
+      overlay.classList.add('lb-open');
     });
   }
   const close = () => overlay.classList.remove('lb-open');
