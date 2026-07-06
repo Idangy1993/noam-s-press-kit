@@ -91,6 +91,14 @@
   .lb-download{position:absolute;top:18px;right:74px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.1);color:#F4F2F8;font-size:17px;text-decoration:none;transition:background .2s;}
   .lb-download:hover{background:var(--lime,#C8FF00);color:#08070C;}
 
+  /* logo download button + menu */
+  .logo-dl-btn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:rgba(244,242,248,.6);font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.06em;padding:6px 12px;cursor:pointer;transition:border-color .2s,color .2s;}
+  .logo-dl-btn:hover{border-color:var(--lime,#C8FF00);color:#F4F2F8;}
+  .logo-menu{position:absolute;right:0;top:calc(100% + 8px);background:#1A1724;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:6px;min-width:185px;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+  .logo-menu button{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;color:rgba(244,242,248,.75);font-family:'Space Grotesk';font-size:13px;font-weight:500;padding:8px 10px;border-radius:7px;cursor:pointer;text-align:left;transition:background .15s,color .15s;}
+  .logo-menu button:hover{background:rgba(255,255,255,.07);color:#F4F2F8;}
+  .logo-swatch{width:16px;height:16px;border-radius:4px;flex-shrink:0;}
+
 </style>
 </helmet>
 <div ref="{{ rootRef }}" id="top" style="font-family:'Space Grotesk',system-ui,sans-serif;color:#F4F2F8;background:#08070C;overflow-x:hidden;position:relative;">
@@ -315,9 +323,19 @@
     <div style="max-width:1180px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(22px,5vw,72px);">
       <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;margin-bottom:30px;">
         <div style="font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink,#FF1E8C);">05 / Photos</div>
-        <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:14px;margin:14px 0 0;">
-          <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(30px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:0;">Press photos</h2>
-          <span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);letter-spacing:.04em;display:inline-flex;align-items:center;gap:5px;"><i class="fa-solid fa-download" style="font-size:10px;color:var(--lime,#C8FF00);"></i> Click any photo to view &amp; download</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin:14px 0 0;">
+          <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:14px;">
+            <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(30px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:0;">Press photos</h2>
+            <span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);letter-spacing:.04em;display:inline-flex;align-items:center;gap:5px;"><i class="fa-solid fa-download" style="font-size:10px;color:var(--lime,#C8FF00);"></i> Click any photo to view &amp; download</span>
+          </div>
+          <div style="position:relative;">
+            <button id="logoMenuBtn" class="logo-dl-btn" onclick="toggleLogoMenu()"><i class="fa-solid fa-download" style="font-size:10px;"></i> Download logo</button>
+            <div id="logoMenu" class="logo-menu" style="display:none;">
+              <button onclick="downloadLogo('white')"><span class="logo-swatch" style="background:#FFFFFF;border:1px solid rgba(0,0,0,.15);"></span> Black on white</button>
+              <button onclick="downloadLogo('black')"><span class="logo-swatch" style="background:#08070C;border:1px solid rgba(255,255,255,.15);"></span> White on black</button>
+              <button onclick="downloadLogo('transparent')"><span class="logo-swatch" style="background:repeating-conic-gradient(rgba(255,255,255,.18) 0% 25%,rgba(255,255,255,.04) 0% 50%) 0/8px 8px;border:1px solid rgba(255,255,255,.15);"></span> Transparent</button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="photo-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:320px 320px 300px 360px;gap:10px;">
@@ -436,6 +454,45 @@
   &quot;lime&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#C8FF00&quot;, &quot;tsType&quot;: &quot;string&quot;},
   &quot;neonGlow&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;}
 }">
+window.toggleLogoMenu = function() {
+  var menu = document.getElementById('logoMenu');
+  if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+};
+
+window.downloadLogo = function(variant) {
+  var menu = document.getElementById('logoMenu');
+  if (menu) menu.style.display = 'none';
+
+  var W = 2400, fontSize = 310, lineGap = 295, padTop = 160, padBottom = 180;
+  var H = padTop + lineGap * 2 + padBottom;
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+
+  if (variant === 'white') { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H); }
+  else if (variant === 'black') { ctx.fillStyle = '#08070C'; ctx.fillRect(0, 0, W, H); }
+  // transparent: no fill
+
+  var textColor = variant === 'white' ? '#08070C' : '#FFFFFF';
+  var fontSpec = '800 ' + fontSize + 'px Unbounded, sans-serif';
+
+  document.fonts.load(fontSpec).then(function() {
+    ctx.fillStyle = textColor;
+    ctx.font = fontSpec;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('NOAM',   W / 2, padTop);
+    ctx.fillText('LESHEM', W / 2, padTop + lineGap);
+    canvas.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'noam-leshem-logo-' + variant + '.png';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    }, 'image/png');
+  });
+};
+
 class Component extends DCLogic {
   componentDidMount() {
     const root = this.root;
@@ -479,6 +536,13 @@ class Component extends DCLogic {
     this.initGlitch();
     this.initLightbox();
     this.initWorldMap();
+    document.addEventListener('click', function(e) {
+      var btn = document.getElementById('logoMenuBtn');
+      var menu = document.getElementById('logoMenu');
+      if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.style.display = 'none';
+      }
+    });
     setTimeout(() => {
       if (window.instgrm) {
         window.instgrm.Embeds.process();
