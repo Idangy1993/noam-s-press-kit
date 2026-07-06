@@ -77,6 +77,7 @@
     .shows-grid{grid-template-columns:1fr !important;}
     .photo-grid > div{grid-column:auto !important;grid-row:auto !important;aspect-ratio:4/3;}
     .photo-grid > div:first-child,.photo-grid > div:last-child{grid-column:1 / 3 !important;aspect-ratio:16 / 9;}
+    .logo-menu{left:0;right:auto;}
   }
 
   /* #6 nav hover */
@@ -196,7 +197,7 @@
     <div style="max-width:1180px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(22px,5vw,72px);">
       <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;margin-bottom:38px;">
         <div style="font-family:'Space Grotesk';font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink,#FF1E8C);">02 / Music</div>
-        <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(30px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:14px 0 0;">Releases &amp; DJ sets</h2>
+        <h2 style="font-family:Unbounded;font-weight:800;font-size:clamp(20px,4vw,52px);line-height:.98;letter-spacing:-.02em;color:#F7F4FB;margin:14px 0 0;white-space:nowrap;">Releases &amp; DJ sets</h2>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;">
 
@@ -609,16 +610,40 @@ function initLightbox() {
       const pic = cell.querySelector('img');
       if (!pic) return;
       img.src = pic.src;
-      // Point download button at full-quality file
       if (dlBtn) {
         const filename = pic.getAttribute('src').split('/').pop().split('?')[0];
         const dlPath = pic.getAttribute('src').includes('uploads/web/')
           ? 'uploads/' + filename
           : 'downloads/' + filename;
+        dlBtn.setAttribute('data-dlpath', dlPath);
+        dlBtn.setAttribute('data-dlname', 'noam-leshem-' + filename.toLowerCase());
+        // keep href as fallback for non-JS
         dlBtn.href = dlPath;
         dlBtn.setAttribute('download', 'noam-leshem-' + filename.toLowerCase());
       }
       overlay.classList.add('lb-open');
+    });
+  }
+  // iOS: intercept click → share sheet so "Save Image" saves to Camera Roll
+  if (dlBtn) {
+    dlBtn.addEventListener('click', e => {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (!isIOS) return; // desktop: let the <a download> work normally
+      e.preventDefault();
+      const dlPath = dlBtn.getAttribute('data-dlpath') || dlBtn.href;
+      const dlName = dlBtn.getAttribute('data-dlname') || 'noam-leshem-photo.jpg';
+      fetch(dlPath)
+        .then(r => r.blob())
+        .then(blob => {
+          const file = new File([blob], dlName, { type: blob.type });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: 'Noam Leshem' });
+          } else {
+            // older iOS fallback: open in new tab → long-press to save
+            window.open(dlPath, '_blank');
+          }
+        })
+        .catch(() => window.open(dlPath, '_blank'));
     });
   }
   const close = () => overlay.classList.remove('lb-open');
