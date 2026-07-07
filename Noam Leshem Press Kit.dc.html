@@ -624,7 +624,6 @@ class Component extends DCLogic {
     root.querySelectorAll('[data-reveal]').forEach((el) => revObs.observe(el));
 
     this.initBPMPulse();
-    this.initGlitch();
     this.initLightbox();
     this.initWorldMap();
     document.addEventListener('click', function(e) {
@@ -758,24 +757,6 @@ class Component extends DCLogic {
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }
-
-  initGlitch() {
-    const el = this.root && this.root.querySelector('#heroName');
-    if (!el) return;
-    const baseGlow = '0 0 22px rgba(255,30,140,.3), 0 0 46px rgba(255,30,140,.12)';
-    const glitch = () => {
-      const seq = [
-        [0,   'translateX(-2px) skewX(-3deg)', '-3px 0 rgba(255,30,140,.6), 3px 0 rgba(200,255,0,.45)'],
-        [55,  'translateX(2px)',                '3px 0 rgba(200,255,0,.5), -2px 0 rgba(255,30,140,.4)'],
-        [100, '',                               baseGlow],
-      ];
-      seq.forEach(([t, transform, shadow]) => {
-        setTimeout(() => { el.style.transform = transform; el.style.textShadow = shadow; }, t);
-      });
-      setTimeout(glitch, 4000 + Math.random() * 7000);
-    };
-    setTimeout(glitch, 3000 + Math.random() * 4000);
   }
 
   initBPMPulse() {
