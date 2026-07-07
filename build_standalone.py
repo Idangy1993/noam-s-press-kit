@@ -395,9 +395,15 @@ def make_sc_card(track_url, thumb_data):
             '<span style="font-family:\'Space Grotesk\',sans-serif;font-size:11px;color:rgba(244,242,248,.35);">Open in browser to play</span>'
             '</div>'
         )
+    badge_html = (
+        '<span style="position:absolute;left:10px;bottom:10px;width:32px;height:32px;border-radius:999px;'
+        'background:#FF5500;display:flex;align-items:center;justify-content:center;'
+        'box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;">'
+        '<i class="fa-brands fa-soundcloud" style="color:#FFFFFF;font-size:15px;"></i></span>'
+    )
     return (
         f'<div style="height:220px;border-radius:11px;overflow:hidden;position:relative;background:#0C0A13;">'
-        f'{thumb_html}'
+        f'{thumb_html}{badge_html}'
         f'</div>'
     )
 
@@ -418,8 +424,10 @@ def replace_sc_iframe(m):
 
 if not WEB:
     # Online, keep the real interactive SoundCloud players; offline, swap for static cards.
+    # The badge <span> after </iframe> (added for platform branding) is optional here
+    # since this regex also needs to match the pre-badge markup structure.
     body_html = re.sub(
-        r'<div[^>]+border-radius:11px[^>]*><iframe[^>]+soundcloud[^>]*></iframe></div>',
+        r'<div[^>]+border-radius:11px[^>]*><iframe[^>]+soundcloud[^>]*></iframe>(?:<span[^>]*>.*?</span>)?</div>',
         replace_sc_iframe,
         body_html
     )

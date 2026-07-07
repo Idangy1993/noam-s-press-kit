@@ -48,6 +48,22 @@
   .float-dock .dock-cta:hover{background:var(--pink,#FF1E8C);color:#08070C;}
   .float-dock .dock-line{width:1px;height:16px;background:rgba(255,255,255,.12);margin:2px 0;}
 
+  /* dock: switch to bottom bar before the side pill can overlap centered content (1180px content + gutter) */
+  @media (max-width:1280px){
+    body{padding-bottom:calc(72px + env(safe-area-inset-bottom));}
+    .float-dock{
+      right:auto;
+      left:50%;
+      top:auto;
+      bottom:calc(14px + env(safe-area-inset-bottom));
+      transform:translateX(-50%);
+      flex-direction:row;
+      padding:8px 16px;
+      gap:2px;
+    }
+    .float-dock .dock-line{width:1px;height:28px;margin:0 4px;}
+  }
+
   /* mobile overrides */
   @media (max-width:860px){
     body{padding-bottom:calc(72px + env(safe-area-inset-bottom));}
@@ -127,7 +143,11 @@
   </div>
 
   <nav style="position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px clamp(20px,5vw,52px);background:rgba(8,7,12,.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07);">
-    <a href="#top" style="font-family:Unbounded;font-weight:800;font-size:15px;letter-spacing:.02em;color:#F4F2F8;text-decoration:none;">NOAM LESHEM</a>
+    <a href="#top" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+      <span style="width:3px;height:15px;border-radius:3px;flex-shrink:0;background:linear-gradient(to bottom, var(--lime,#C8FF00), var(--pink,#FF1E8C));"></span>
+      <span style="font-family:Unbounded;font-weight:800;font-size:15px;letter-spacing:.02em;color:#F4F2F8;">NOAM</span>
+      <span style="font-family:Unbounded;font-weight:700;font-size:15px;letter-spacing:.02em;color:transparent;-webkit-text-stroke:.05em #F4F2F8;">LESHEM</span>
+    </a>
     <div style="display:flex;align-items:center;gap:24px;">
       <div class="nav-links" style="display:flex;gap:24px;align-items:center;">
         <a href="#bio" style="font-family:'Space Grotesk';font-weight:500;font-size:13px;letter-spacing:.02em;color:rgba(244,242,248,.66);text-decoration:none;" style-hover="color:var(--pink,#FF1E8C);">Bio</a>
@@ -151,7 +171,13 @@
       <div class="hero-label" style="display:inline-flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:600;font-size:clamp(11px,1.3vw,13px);letter-spacing:.26em;text-transform:uppercase;color:var(--lime,#C8FF00);">
         <span id="bpmDot" style="width:7px;height:7px;border-radius:999px;background:var(--lime,#C8FF00);box-shadow:0 0 14px var(--lime,#C8FF00);display:inline-block;"></span> DJ &amp; Producer · Psytrance · Deep Techno · Electronic
       </div>
-      <h1 id="heroName" style="font-family:Unbounded;font-weight:800;font-size:clamp(52px,12vw,148px);line-height:.92;letter-spacing:-.02em;color:#F7F4FB;margin:16px 0 0;">NOAM<br>LESHEM</h1>
+      <h1 id="heroName" style="display:flex;align-items:center;gap:clamp(14px,2.6vw,28px);margin:16px 0 0;">
+        <span style="align-self:stretch;width:clamp(4px,.6vw,6px);flex-shrink:0;border-radius:6px;background:linear-gradient(to bottom, var(--lime,#C8FF00), var(--pink,#FF1E8C));box-shadow:0 0 26px rgba(255,30,140,.45);"></span>
+        <span style="line-height:.92;">
+          <span style="display:block;font-family:Unbounded;font-weight:800;font-size:clamp(52px,12vw,148px);letter-spacing:-.02em;color:#F7F4FB;">NOAM</span>
+          <span style="display:block;font-family:Unbounded;font-weight:700;font-size:clamp(52px,12vw,148px);letter-spacing:-.01em;color:transparent;-webkit-text-stroke:.018em #F7F4FB;">LESHEM</span>
+        </span>
+      </h1>
       <p style="font-family:'Space Grotesk';font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(244,242,248,.38);margin:32px 0 0;animation:scrollcue 2.2s ease-in-out infinite;">↓</p>
     </div>
   </header>
@@ -202,7 +228,7 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;">
 
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(255,30,140,.55);">
-          <div style="border-radius:11px;overflow:hidden;"><iframe width="100%" height="220" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/noam-leshem/imagine-festival&color=%23FF1E8C&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true" style="display:block;"></iframe></div>
+          <div style="position:relative;border-radius:11px;overflow:hidden;height:220px;"><iframe width="100%" height="240" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/noam-leshem/imagine-festival&color=%23FF1E8C&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true" style="display:block;"></iframe><span style="position:absolute;left:10px;bottom:10px;width:32px;height:32px;border-radius:999px;background:#FF5500;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;"><i class="fa-brands fa-soundcloud" style="color:#FFFFFF;font-size:15px;"></i></span></div>
           <div>
             <div style="font-family:Unbounded;font-weight:700;font-size:17px;color:#F4F2F8;">IMAGiNE Festival 2025</div>
             <div style="font-family:'Space Grotesk';font-size:13px;color:rgba(244,242,248,.5);margin-top:4px;">Live set · Oct 2025</div>
@@ -211,7 +237,16 @@
         </div>
 
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .08s,transform .7s ease .08s;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(200,255,0,.5);">
-          <div style="border-radius:11px;overflow:hidden;"><iframe width="100%" height="220" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/noam-leshem/noam-leshem-psy-trance-set&color=%23C8FF00&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true" style="display:block;"></iframe></div>
+          <div style="position:relative;border-radius:11px;overflow:hidden;height:220px;background:#110F17;display:flex;align-items:center;"><iframe width="100%" height="152" scrolling="no" frameborder="no" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" src="https://open.spotify.com/embed/track/17s5KMqYcXAHkr8LLaf9r0?utm_source=generator" style="display:block;"></iframe><span style="position:absolute;left:10px;bottom:10px;width:32px;height:32px;border-radius:999px;background:#1DB954;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;z-index:2;"><i class="fa-brands fa-spotify" style="color:#08070C;font-size:16px;"></i></span></div>
+          <div>
+            <div style="font-family:Unbounded;font-weight:700;font-size:17px;color:#F4F2F8;">The Groove Beat</div>
+            <div style="font-family:'Space Grotesk';font-size:13px;color:rgba(244,242,248,.5);margin-top:4px;">Original release · KADI (IL) & Noam Leshem</div>
+          </div>
+          <a href="https://open.spotify.com/track/17s5KMqYcXAHkr8LLaf9r0" target="_blank" style="display:inline-flex;align-items:center;gap:8px;color:var(--pink,#FF1E8C);font-family:'Space Grotesk';font-weight:600;font-size:13px;text-decoration:none;" style-hover="color:var(--lime,#C8FF00);"><i class="fa-brands fa-spotify"></i> Listen on Spotify</a>
+        </div>
+
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .16s,transform .7s ease .16s;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(255,30,140,.55);">
+          <div style="position:relative;border-radius:11px;overflow:hidden;height:220px;"><iframe width="100%" height="240" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/noam-leshem/noam-leshem-psy-trance-set&color=%23C8FF00&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true" style="display:block;"></iframe><span style="position:absolute;left:10px;bottom:10px;width:32px;height:32px;border-radius:999px;background:#FF5500;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;"><i class="fa-brands fa-soundcloud" style="color:#FFFFFF;font-size:15px;"></i></span></div>
           <div>
             <div style="font-family:Unbounded;font-weight:700;font-size:17px;color:#F4F2F8;">PSY TRANCE Set</div>
             <div style="font-family:'Space Grotesk';font-size:13px;color:rgba(244,242,248,.5);margin-top:4px;">Studio set · Oct 2024</div>
@@ -219,22 +254,13 @@
           <a href="https://soundcloud.com/noam-leshem/noam-leshem-psy-trance-set" target="_blank" style="display:inline-flex;align-items:center;gap:8px;color:var(--pink,#FF1E8C);font-family:'Space Grotesk';font-weight:600;font-size:13px;text-decoration:none;" style-hover="color:var(--lime,#C8FF00);"><i class="fa-brands fa-soundcloud"></i> Listen on SoundCloud</a>
         </div>
 
-        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .16s,transform .7s ease .16s;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(255,30,140,.55);">
-          <div style="border-radius:11px;overflow:hidden;"><iframe width="100%" height="220" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/noam-leshem/sunrise-magic-ecstatica-camp-midburn&color=%23FF1E8C&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true" style="display:block;"></iframe></div>
+        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .24s,transform .7s ease .24s;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(200,255,0,.5);">
+          <div style="position:relative;border-radius:11px;overflow:hidden;height:220px;"><iframe width="100%" height="240" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/noam-leshem/sunrise-magic-ecstatica-camp-midburn&color=%23FF1E8C&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true" style="display:block;"></iframe><span style="position:absolute;left:10px;bottom:10px;width:32px;height:32px;border-radius:999px;background:#FF5500;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;"><i class="fa-brands fa-soundcloud" style="color:#FFFFFF;font-size:15px;"></i></span></div>
           <div>
             <div style="font-family:Unbounded;font-weight:700;font-size:17px;color:#F4F2F8;">Sunrise Magic at Midburn</div>
             <div style="font-family:'Space Grotesk';font-size:13px;color:rgba(244,242,248,.5);margin-top:4px;">Live set · Ecstatica Camp · Jun 2024</div>
           </div>
           <a href="https://soundcloud.com/noam-leshem/sunrise-magic-ecstatica-camp-midburn" target="_blank" style="display:inline-flex;align-items:center;gap:8px;color:var(--pink,#FF1E8C);font-family:'Space Grotesk';font-weight:600;font-size:13px;text-decoration:none;" style-hover="color:var(--lime,#C8FF00);"><i class="fa-brands fa-soundcloud"></i> Listen on SoundCloud</a>
-        </div>
-
-        <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .24s,transform .7s ease .24s;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(200,255,0,.5);">
-          <div style="border-radius:11px;overflow:hidden;"><iframe width="100%" height="152" scrolling="no" frameborder="no" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" src="https://open.spotify.com/embed/track/17s5KMqYcXAHkr8LLaf9r0?utm_source=generator" style="display:block;"></iframe></div>
-          <div>
-            <div style="font-family:Unbounded;font-weight:700;font-size:17px;color:#F4F2F8;">The Groove Beat</div>
-            <div style="font-family:'Space Grotesk';font-size:13px;color:rgba(244,242,248,.5);margin-top:4px;">Original release · KADI (IL) & Noam Leshem</div>
-          </div>
-          <a href="https://open.spotify.com/track/17s5KMqYcXAHkr8LLaf9r0" target="_blank" style="display:inline-flex;align-items:center;gap:8px;color:var(--pink,#FF1E8C);font-family:'Space Grotesk';font-weight:600;font-size:13px;text-decoration:none;" style-hover="color:var(--lime,#C8FF00);"><i class="fa-brands fa-spotify"></i> Listen on Spotify</a>
         </div>
 
       </div>
@@ -431,7 +457,7 @@
           <!-- booking agent row -->
           <div style="border-top:1px solid rgba(255,255,255,.12);padding:22px 0;">
             <div style="font-family:'Space Grotesk';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,248,.4);margin-bottom:8px;">Booking agent</div>
-            <div style="font-family:Unbounded;font-weight:700;font-size:clamp(18px,2vw,24px);color:#F4F2F8;margin-bottom:4px;">Alteza</div>
+            <img loading="lazy" decoding="async" src="assets/alteza-logo.jpg" alt="Alteza" style="height:52px;width:52px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.14);margin-bottom:10px;display:block;">
             <div style="font-family:'Space Grotesk';font-weight:500;font-size:15px;color:rgba(244,242,248,.75);margin-bottom:10px;">Dima Gafner</div>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
               <a href="mailto:Dima@fantastic-management.com" style="font-family:'Space Grotesk';font-weight:500;font-size:clamp(14px,1.4vw,17px);color:var(--pink,#FF1E8C);text-decoration:none;letter-spacing:.01em;word-break:break-all;" style-hover="color:var(--lime,#C8FF00);">Dima@fantastic-management.com</a>
@@ -514,26 +540,59 @@ window.downloadLogo = function(variant) {
 var menu = document.getElementById('logoMenu');
 if (menu) menu.style.display = 'none';
 
-var W = 2400, fontSize = 310, lineGap = 295, padTop = 160, padBottom = 180;
-var H = padTop + lineGap * 2 + padBottom;
-var canvas = document.createElement('canvas');
-canvas.width = W; canvas.height = H;
-var ctx = canvas.getContext('2d');
-
-if (variant === 'white') { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H); }
-else if (variant === 'black') { ctx.fillStyle = '#08070C'; ctx.fillRect(0, 0, W, H); }
-// transparent: no fill
-
+var fontSize = 310, lineGap = 295, padTop = 160, padBottom = 180, padSide = 140;
+var barWidth = fontSize * .04, gap = fontSize * .29;
 var textColor = variant === 'white' ? '#08070C' : '#FFFFFF';
-var fontSpec = '800 ' + fontSize + 'px Unbounded, sans-serif';
+var noamSpec = '800 ' + fontSize + 'px Unbounded, sans-serif';
+var leshemSpec = '700 ' + fontSize + 'px Unbounded, sans-serif';
 
-document.fonts.load(fontSpec).then(function() {
-  ctx.fillStyle = textColor;
-  ctx.font = fontSpec;
-  ctx.textAlign = 'center';
+Promise.all([document.fonts.load(noamSpec), document.fonts.load(leshemSpec)]).then(function() {
+  // measure with a throwaway context before sizing the real canvas
+  var measure = document.createElement('canvas').getContext('2d');
+  measure.font = noamSpec;
+  var noamWidth = measure.measureText('NOAM').width;
+  measure.font = leshemSpec;
+  var leshemWidth = measure.measureText('LESHEM').width;
+  var textWidth = Math.max(noamWidth, leshemWidth);
+
+  var W = padSide + barWidth + gap + textWidth + padSide;
+  var H = padTop + lineGap * 2 + padBottom;
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+
+  if (variant === 'white') { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H); }
+  else if (variant === 'black') { ctx.fillStyle = '#08070C'; ctx.fillRect(0, 0, W, H); }
+  // transparent: no fill
+
+  // gradient accent bar, stretched to the text block's height
+  var barX = padSide, barY = padTop, barH = H - padTop - padBottom;
+  var barGrad = ctx.createLinearGradient(0, barY, 0, barY + barH);
+  barGrad.addColorStop(0, '#C8FF00');
+  barGrad.addColorStop(1, '#FF1E8C');
+  ctx.fillStyle = barGrad;
+  ctx.shadowColor = 'rgba(255,30,140,.45)';
+  ctx.shadowBlur = 40;
+  ctx.beginPath();
+  ctx.roundRect(barX, barY, barWidth, barH, barWidth / 2);
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+
+  var textX = padSide + barWidth + gap;
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
-  ctx.fillText('NOAM',   W / 2, padTop);
-  ctx.fillText('LESHEM', W / 2, padTop + lineGap);
+
+  ctx.fillStyle = textColor;
+  ctx.font = noamSpec;
+  ctx.fillText('NOAM', textX, padTop);
+
+  // LESHEM is hollow: stroke only, letting the background show through
+  ctx.font = leshemSpec;
+  ctx.strokeStyle = textColor;
+  ctx.lineWidth = fontSize * .017;
+  ctx.strokeText('LESHEM', textX, padTop + lineGap);
+
   canvas.toBlob(function(blob) {
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -567,7 +626,7 @@ function componentDidMount() {
 
   if (true !== false) {
     const name = root.querySelector('#heroName');
-    if (name) name.style.textShadow = '0 0 18px rgba(255,30,140,.22), 0 0 42px rgba(255,30,140,.09)';
+    if (name) name.style.textShadow = '0 0 22px rgba(255,30,140,.3), 0 0 46px rgba(255,30,140,.12)';
   }
 
   const revObs = new IntersectionObserver((entries) => {
@@ -721,7 +780,7 @@ function initParticles() {
 function initGlitch() {
   const el = root && root.querySelector('#heroName');
   if (!el) return;
-  const baseGlow = '0 0 42px rgba(255,30,140,.55), 0 0 90px rgba(255,30,140,.3)';
+  const baseGlow = '0 0 22px rgba(255,30,140,.3), 0 0 46px rgba(255,30,140,.12)';
   const glitch = () => {
     const seq = [
       [0,   'translateX(-2px) skewX(-3deg)', '-3px 0 rgba(255,30,140,.6), 3px 0 rgba(200,255,0,.45)'],
