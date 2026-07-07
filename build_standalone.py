@@ -157,40 +157,44 @@ def _build_world_svg(atlas_json_str, W=800, H=400):
                 for r in p: ds.append(ring_d(r))
         return ' '.join(d for d in ds if d)
 
+    # ISO numeric ids — must match data-country on .festival-row in the template
     highlighted = {376, 840, 356, 764, 300, 784, 620}
     normal, hl = [], []
     for geo in data['objects']['countries']['geometries']:
         gid = int(geo.get('id') or 0)
         d = geo_d(geo)
         if not d: continue
-        (hl if gid in highlighted else normal).append(d)
+        (hl if gid in highlighted else normal).append((gid, d))
 
+    # (label, lon, lat, label offset, ISO numeric country id)
     locs = [
-        ('Tel Aviv',    34.78,  32.07, -10),
-        ('Hawaii',    -157.8,   21.3,  -10),
-        ('Los Angeles',-118.2,  34.05,  13),
-        ('Goa',         73.83,  15.5,  -10),
-        ('Thailand',   100.5,   13.75, -10),
-        ('Greece',      23.7,   37.98, -10),
-        ('Crete',       25.0,   35.3,   13),
-        ('Portugal',    -8.2,   39.4,  -10),
-        ('Dubai',       55.3,   25.2,  -10),
+        ('Tel Aviv',    34.78,  32.07, -10, 376),
+        ('Hawaii',    -157.8,   21.3,  -10, 840),
+        ('Los Angeles',-118.2,  34.05,  13, 840),
+        ('Goa',         73.83,  15.5,  -10, 356),
+        ('Thailand',   100.5,   13.75, -10, 764),
+        ('Greece',      23.7,   37.98, -10, 300),
+        ('Crete',       25.0,   35.3,   13, 300),
+        ('Portugal',    -8.2,   39.4,  -10, 620),
+        ('Dubai',       55.3,   25.2,  -10, 784),
     ]
 
     dots = []
-    for label, lon, lat, dy in locs:
+    for label, lon, lat, dy, cid in locs:
         x, y = proj(lon, lat)
         dots.append(
+            f'<g class="map-loc" data-country="{cid}">'
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="14" fill="rgba(255,30,140,0.08)"/>'
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="7" fill="rgba(255,30,140,0.18)"/>'
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="#FF1E8C"/>'
             f'<text x="{x:.1f}" y="{y+dy:.1f}" text-anchor="middle" '
             f'font-family="\'Space Grotesk\',sans-serif" font-size="9" '
             f'fill="rgba(244,242,248,0.75)">{label}</text>'
+            f'</g>'
         )
 
-    normal_svg = ''.join(f'<path d="{d}" fill="#18152A" stroke="rgba(255,255,255,0.07)" stroke-width="0.3"/>' for d in normal)
-    hl_svg = ''.join(f'<path d="{d}" fill="rgba(255,30,140,0.2)" stroke="rgba(255,30,140,0.5)" stroke-width="0.8"/>' for d in hl)
+    normal_svg = ''.join(f'<path class="map-country" data-country="{gid}" d="{d}" fill="#18152A" stroke="rgba(255,255,255,0.07)" stroke-width="0.3"/>' for gid, d in normal)
+    hl_svg = ''.join(f'<path class="map-country" data-country="{gid}" d="{d}" fill="rgba(255,30,140,0.2)" stroke="rgba(255,30,140,0.5)" stroke-width="0.8"/>' for gid, d in hl)
     dots_svg = ''.join(dots)
 
     return (
@@ -569,6 +573,37 @@ PAGE_LOGIC = f'''<script>
 }})();
 </script>'''
 
+# The map ships as a pre-rendered static SVG (see _build_world_svg above), so the canvas-based
+# hover logic in the .dc.html source (which needs topojson + a live <canvas>) never runs here.
+# This wires the same festival-list interaction directly to that SVG's tagged elements instead.
+FESTIVAL_MAP_JS = '''<script>
+(function() {
+  var rows = document.querySelectorAll('.festival-row');
+  if (!rows.length) return;
+  var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var pinned = null;
+  function mapEls(id) {
+    return document.querySelectorAll('.map-country[data-country="' + id + '"], .map-loc[data-country="' + id + '"]');
+  }
+  function highlight(row) {
+    document.querySelectorAll('.map-country.map-pop, .map-loc.map-pop').forEach(function(el) { el.classList.remove('map-pop'); });
+    rows.forEach(function(r) {
+      r.classList.toggle('is-active', r === row);
+      r.setAttribute('aria-pressed', r === row ? 'true' : 'false');
+    });
+    if (row) mapEls(row.getAttribute('data-country')).forEach(function(el) { el.classList.add('map-pop'); });
+  }
+  rows.forEach(function(row) {
+    row.addEventListener('mouseenter', function() { if (canHover) highlight(row); });
+    row.addEventListener('mouseleave', function() { if (canHover) highlight(pinned); });
+    row.addEventListener('focus', function() { highlight(row); });
+    row.addEventListener('blur', function() { highlight(pinned); });
+    row.addEventListener('click', function() { pinned = (pinned === row) ? null : row; highlight(pinned); });
+    row.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); } });
+  });
+})();
+</script>'''
+
 if WEB:
     og_image = (SITE_URL.rstrip('/') + '/assets/' + poster_fname) if SITE_URL else 'assets/' + poster_fname
     mobile_src = "small ? 'hero-mobile.mp4' : 'hero.mp4'" if have_mobile_video else "'hero.mp4'"
@@ -629,6 +664,7 @@ if WEB:
 </script>
 <script>var WORLD_ATLAS = null;</script>
 {PAGE_LOGIC}
+{FESTIVAL_MAP_JS}
 </body>
 </html>'''
 else:
@@ -700,6 +736,7 @@ else:
 var WORLD_ATLAS = {atlas_json};
 </script>
 {PAGE_LOGIC}
+{FESTIVAL_MAP_JS}
 </body>
 </html>'''
 

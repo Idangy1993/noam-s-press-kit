@@ -57,6 +57,25 @@
     .float-dock .dock-line{width:1px;height:28px;margin:0 4px;}
   }
 
+  /* #12 festival list ↔ map interactivity */
+  .festival-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 10px;margin:0 -10px;border-radius:8px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s ease;}
+  .festival-row:last-child{border-bottom:none;}
+  .festival-row:hover,.festival-row.is-active{background:rgba(255,30,140,.08);}
+  .festival-row:focus-visible{outline:2px solid var(--pink,#FF1E8C);outline-offset:-1px;}
+  .festival-main{display:flex;align-items:center;gap:9px;min-width:0;}
+  .festival-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.18);flex-shrink:0;transition:background .2s ease,box-shadow .2s ease,transform .2s ease;}
+  .festival-row:hover .festival-dot,.festival-row.is-active .festival-dot{background:var(--pink,#FF1E8C);box-shadow:0 0 9px rgba(255,30,140,.8);transform:scale(1.4);}
+  .festival-name{font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;transition:color .2s ease;}
+  .festival-row:hover .festival-name,.festival-row.is-active .festival-name{color:var(--pink,#FF1E8C);}
+  .festival-country{font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);flex-shrink:0;transition:color .2s ease;}
+  .festival-row:hover .festival-country,.festival-row.is-active .festival-country{color:rgba(244,242,248,.6);}
+  .festival-hint{font-family:'Space Grotesk';font-size:10px;letter-spacing:.02em;color:rgba(244,242,248,.28);margin-top:10px;}
+  /* SVG map (shipped/static build): country + city pop state */
+  .map-country{transition:fill .28s ease,stroke .28s ease,filter .28s ease,transform .28s ease;transform-box:fill-box;transform-origin:center;}
+  .map-country.map-pop{fill:rgba(255,30,140,.55) !important;stroke:rgba(255,30,140,.95) !important;stroke-width:1.4;filter:drop-shadow(0 0 9px rgba(255,30,140,.75));transform:scale(1.05);}
+  .map-loc{transition:transform .28s ease;transform-box:fill-box;transform-origin:center;}
+  .map-loc.map-pop{transform:scale(1.35);}
+
   /* mobile overrides */
   @media (max-width:860px){
     body{padding-bottom:calc(72px + env(safe-area-inset-bottom));}
@@ -84,6 +103,8 @@
 
     .photo-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;grid-template-rows:auto !important;}
     .shows-grid{grid-template-columns:1fr !important;}
+    .festival-row{padding:13px 10px;}
+    .festival-name{font-size:15px;}
     .photo-grid > div{grid-column:auto !important;grid-row:auto !important;aspect-ratio:4/3;}
     .photo-grid > div:first-child,.photo-grid > div:last-child{grid-column:1 / 3 !important;aspect-ratio:16 / 9;}
     .logo-menu{left:0;right:auto;}
@@ -133,9 +154,8 @@
 
   <nav style="position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px clamp(20px,5vw,52px);background:rgba(8,7,12,.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07);">
     <a href="#top" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
-      <span style="width:3px;height:15px;border-radius:3px;flex-shrink:0;background:linear-gradient(to bottom, var(--lime,#C8FF00), var(--pink,#FF1E8C));"></span>
       <span style="font-family:Unbounded;font-weight:800;font-size:15px;letter-spacing:.02em;color:#F4F2F8;">NOAM</span>
-      <span style="font-family:Unbounded;font-weight:700;font-size:15px;letter-spacing:.02em;color:transparent;-webkit-text-stroke:.05em #F4F2F8;">LESHEM</span>
+      <span style="font-family:Unbounded;font-weight:800;font-size:15px;letter-spacing:.02em;color:transparent;-webkit-text-stroke:.05em #F4F2F8;">LESHEM</span>
     </a>
     <div style="display:flex;align-items:center;gap:24px;">
       <div class="nav-links" style="display:flex;gap:24px;align-items:center;">
@@ -160,11 +180,10 @@
       <div class="hero-label" style="display:inline-flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:600;font-size:clamp(11px,1.3vw,13px);letter-spacing:.26em;text-transform:uppercase;color:var(--lime,#C8FF00);">
         <span id="bpmDot" style="width:7px;height:7px;border-radius:999px;background:var(--lime,#C8FF00);box-shadow:0 0 14px var(--lime,#C8FF00);display:inline-block;"></span> DJ &amp; Producer · Psytrance · Deep Techno · Electronic
       </div>
-      <h1 id="heroName" style="display:flex;align-items:center;gap:clamp(14px,2.6vw,28px);margin:16px 0 0;">
-        <span style="align-self:stretch;width:clamp(4px,.6vw,6px);flex-shrink:0;border-radius:6px;background:linear-gradient(to bottom, var(--lime,#C8FF00), var(--pink,#FF1E8C));box-shadow:0 0 26px rgba(255,30,140,.45);"></span>
+      <h1 id="heroName" style="margin:16px 0 0;">
         <span style="line-height:.92;">
           <span style="display:block;font-family:Unbounded;font-weight:800;font-size:clamp(52px,12vw,148px);letter-spacing:-.02em;color:#F7F4FB;">NOAM</span>
-          <span style="display:block;font-family:Unbounded;font-weight:700;font-size:clamp(52px,12vw,148px);letter-spacing:-.01em;color:transparent;-webkit-text-stroke:.018em #F7F4FB;">LESHEM</span>
+          <span style="display:block;font-family:Unbounded;font-weight:800;font-size:clamp(52px,12vw,148px);letter-spacing:-.02em;color:transparent;-webkit-text-stroke:.024em #F7F4FB;">LESHEM</span>
         </span>
       </h1>
       <p style="font-family:'Space Grotesk';font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(244,242,248,.38);margin:32px 0 0;animation:scrollcue 2.2s ease-in-out infinite;">↓</p>
@@ -226,7 +245,7 @@
         </div>
 
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .08s,transform .7s ease .08s;background:#110F17;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;" style-hover="border-color:rgba(200,255,0,.5);">
-          <div style="position:relative;border-radius:11px;overflow:hidden;height:220px;background:#110F17;display:flex;align-items:center;"><iframe width="100%" height="152" scrolling="no" frameborder="no" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" src="https://open.spotify.com/embed/track/17s5KMqYcXAHkr8LLaf9r0?utm_source=generator" style="display:block;"></iframe><span style="position:absolute;left:10px;bottom:10px;width:32px;height:32px;border-radius:999px;background:#1DB954;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;z-index:2;"><i class="fa-brands fa-spotify" style="color:#08070C;font-size:16px;"></i></span></div>
+          <div style="position:relative;border-radius:11px;overflow:hidden;height:220px;background:#415B00;display:flex;align-items:center;"><iframe width="100%" height="152" scrolling="no" frameborder="no" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" src="https://open.spotify.com/embed/track/17s5KMqYcXAHkr8LLaf9r0?utm_source=generator" style="display:block;"></iframe><span style="position:absolute;left:10px;bottom:10px;width:32px;height:32px;border-radius:999px;background:#1DB954;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;z-index:2;"><i class="fa-brands fa-spotify" style="color:#08070C;font-size:16px;"></i></span></div>
           <div>
             <div style="font-family:Unbounded;font-weight:700;font-size:17px;color:#F4F2F8;">The Groove Beat</div>
             <div style="font-family:'Space Grotesk';font-size:13px;color:rgba(244,242,248,.5);margin-top:4px;">Original release · KADI (IL) & Noam Leshem</div>
@@ -269,13 +288,16 @@
         <!-- Left: festival list -->
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .06s,transform .7s ease .06s;">
           <div style="font-family:'Space Grotesk';font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(244,242,248,.28);margin-bottom:8px;">Festivals</div>
-          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Midburn</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Israel</span></div>
-          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Burning Man</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Nevada, US</span></div>
-          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">IMAGiNE Festival</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Israel</span></div>
-          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Hilltop</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Goa, India</span></div>
-          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Darwish Land</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Israel</span></div>
-          <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">Boom Festival</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Portugal</span></div>
-          <div style="display:flex;justify-content:space-between;padding:9px 0;"><span style="font-family:'Space Grotesk';font-size:14px;font-weight:500;color:#F4F2F8;">River Riders Festival</span><span style="font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);">Portugal</span></div>
+          <div id="festivalList">
+            <div class="festival-row" data-country="376" tabindex="0" role="button" aria-pressed="false"><span class="festival-main"><span class="festival-dot"></span><span class="festival-name">Midburn</span></span><span class="festival-country">Israel</span></div>
+            <div class="festival-row" data-country="840" tabindex="0" role="button" aria-pressed="false"><span class="festival-main"><span class="festival-dot"></span><span class="festival-name">Burning Man</span></span><span class="festival-country">Nevada, US</span></div>
+            <div class="festival-row" data-country="376" tabindex="0" role="button" aria-pressed="false"><span class="festival-main"><span class="festival-dot"></span><span class="festival-name">IMAGiNE Festival</span></span><span class="festival-country">Israel</span></div>
+            <div class="festival-row" data-country="356" tabindex="0" role="button" aria-pressed="false"><span class="festival-main"><span class="festival-dot"></span><span class="festival-name">Hilltop</span></span><span class="festival-country">Goa, India</span></div>
+            <div class="festival-row" data-country="376" tabindex="0" role="button" aria-pressed="false"><span class="festival-main"><span class="festival-dot"></span><span class="festival-name">Darwish Land</span></span><span class="festival-country">Israel</span></div>
+            <div class="festival-row" data-country="620" tabindex="0" role="button" aria-pressed="false"><span class="festival-main"><span class="festival-dot"></span><span class="festival-name">Boom Festival</span></span><span class="festival-country">Portugal</span></div>
+            <div class="festival-row" data-country="620" tabindex="0" role="button" aria-pressed="false"><span class="festival-main"><span class="festival-dot"></span><span class="festival-name">River Riders Festival</span></span><span class="festival-country">Portugal</span></div>
+          </div>
+          <div class="festival-hint">Hover or tap a festival to find it on the map</div>
         </div>
 
         <!-- Right: world map canvas -->
@@ -786,6 +808,9 @@ class Component extends DCLogic {
       this._worldTopo = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
     } catch(e) { return; }
 
+    let activeCountry = null; // ISO numeric id of the festival country to pop, or null
+    let popT = 0;             // 0..1 animation progress toward the popped state
+
     const draw = () => {
       const W = canvas.offsetWidth;
       const H = canvas.offsetHeight || (canvas.offsetWidth / 2);
@@ -795,14 +820,52 @@ class Component extends DCLogic {
       canvas.height = H * dpr;
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
-      this._drawMap(ctx, W, H);
+      this._drawMap(ctx, W, H, activeCountry, popT);
+    };
+
+    const stepPop = () => {
+      const target = activeCountry ? 1 : 0;
+      popT += (target - popT) * 0.2;
+      if (Math.abs(target - popT) < 0.004) popT = target;
+      draw();
+      if (popT !== target) requestAnimationFrame(stepPop);
+    };
+
+    const setActiveCountry = (id) => {
+      if (id === activeCountry) return;
+      activeCountry = id;
+      requestAnimationFrame(stepPop);
     };
 
     draw();
     window.addEventListener('resize', () => { clearTimeout(this._mapResizeTimer); this._mapResizeTimer = setTimeout(draw, 80); });
+
+    // Festival list ↔ map: hover pops the country on desktop, tap/click pins it (phones + keyboard)
+    const rows = this.root.querySelectorAll('.festival-row');
+    if (rows.length) {
+      const canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      let pinned = null;
+      const highlight = (row) => {
+        rows.forEach((r) => {
+          r.classList.toggle('is-active', r === row);
+          r.setAttribute('aria-pressed', r === row ? 'true' : 'false');
+        });
+        setActiveCountry(row ? parseInt(row.getAttribute('data-country'), 10) : null);
+      };
+      rows.forEach((row) => {
+        row.addEventListener('mouseenter', () => { if (canHover) highlight(row); });
+        row.addEventListener('mouseleave', () => { if (canHover) highlight(pinned); });
+        row.addEventListener('focus', () => highlight(row));
+        row.addEventListener('blur', () => highlight(pinned));
+        row.addEventListener('click', () => { pinned = pinned === row ? null : row; highlight(pinned); });
+        row.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+        });
+      });
+    }
   }
 
-  _drawMap(ctx, W, H) {
+  _drawMap(ctx, W, H, activeCountry, popT) {
     const LAT_MAX = 78, LAT_MIN = -56;
     const project = (lon, lat) => [
       (lon + 180) / 360 * W,
@@ -816,8 +879,11 @@ class Component extends DCLogic {
     ctx.fillRect(0, 0, W, H);
 
     const countries = window.topojson.feature(this._worldTopo, this._worldTopo.objects.countries);
+    const activeFeature = activeCountry ? countries.features.find(f => parseInt(f.id) === activeCountry) : null;
+
     countries.features.forEach(f => {
       const id = parseInt(f.id);
+      if (id === activeCountry) return; // drawn last, on top, so its glow isn't clipped by neighbors
       ctx.beginPath();
       this._geoPath(ctx, f.geometry, project);
       if (highlighted.has(id)) {
@@ -834,33 +900,60 @@ class Component extends DCLogic {
       ctx.stroke();
     });
 
-    // [label, lon, lat, labelDy] — labelDy>0 draws label below the dot to avoid collisions
+    // Popped-out active country: scaled up around its own centroid, with a soft glow
+    if (activeFeature && popT > 0.01) {
+      let sx = 0, sy = 0, n = 0;
+      const addRing = (coords) => coords.forEach(([lon, lat]) => { const [x, y] = project(lon, lat); sx += x; sy += y; n++; });
+      if (activeFeature.geometry.type === 'Polygon') activeFeature.geometry.coordinates.forEach(addRing);
+      else if (activeFeature.geometry.type === 'MultiPolygon') activeFeature.geometry.coordinates.forEach(p => p.forEach(addRing));
+      const cx = n ? sx / n : W / 2, cy = n ? sy / n : H / 2;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(1 + 0.08 * popT, 1 + 0.08 * popT);
+      ctx.translate(-cx, -cy);
+      ctx.shadowColor = 'rgba(255,30,140,.9)';
+      ctx.shadowBlur = 22 * popT;
+      ctx.beginPath();
+      this._geoPath(ctx, activeFeature.geometry, project);
+      ctx.fillStyle = `rgba(255,30,140,${(0.2 + 0.55 * popT).toFixed(3)})`;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = `rgba(255,30,140,${(0.5 + 0.5 * popT).toFixed(3)})`;
+      ctx.lineWidth = 0.8 + 1.4 * popT;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // [label, lon, lat, labelDy, countryId] — labelDy>0 draws label below the dot to avoid collisions
     const locs = [
-      ['Tel Aviv',    34.78,  32.07, -12],
-      ['Hawaii',    -157.8,   21.3,  -12],
-      ['Los Angeles', -118.2,  34.05,  16],
-      ['Goa',         73.83,  15.5,  -12],
-      ['Thailand',   100.5,   13.75, -12],
-      ['Greece',      23.7,   37.98, -12],
-      ['Crete',       25.0,   35.3,   16],
-      ['Portugal',    -8.2,   39.4,  -12],
-      ['Dubai',       55.3,   25.2,  -12],
+      ['Tel Aviv',    34.78,  32.07, -12, 376],
+      ['Hawaii',    -157.8,   21.3,  -12, 840],
+      ['Los Angeles', -118.2,  34.05,  16, 840],
+      ['Goa',         73.83,  15.5,  -12, 356],
+      ['Thailand',   100.5,   13.75, -12, 764],
+      ['Greece',      23.7,   37.98, -12, 300],
+      ['Crete',       25.0,   35.3,   16, 300],
+      ['Portugal',    -8.2,   39.4,  -12, 620],
+      ['Dubai',       55.3,   25.2,  -12, 784],
     ];
 
-    locs.forEach(([label, lon, lat, labelDy]) => {
+    locs.forEach(([label, lon, lat, labelDy, countryId]) => {
       const [x, y] = project(lon, lat);
-      const glow = ctx.createRadialGradient(x, y, 0, x, y, 20);
-      glow.addColorStop(0, 'rgba(255,30,140,.5)');
+      const boost = countryId === activeCountry ? popT : 0;
+      const glowR = 20 + 12 * boost;
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, glowR);
+      glow.addColorStop(0, `rgba(255,30,140,${(0.5 + 0.35 * boost).toFixed(3)})`);
       glow.addColorStop(1, 'rgba(255,30,140,0)');
       ctx.fillStyle = glow;
-      ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, glowR, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#FF1E8C';
-      ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, 3.5 + 2.5 * boost, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = 'rgba(255,255,255,.55)';
       ctx.lineWidth = 1;
       ctx.stroke();
       if (W >= 480) {
-        ctx.fillStyle = 'rgba(244,242,248,.72)';
+        ctx.fillStyle = `rgba(244,242,248,${(0.72 + 0.28 * boost).toFixed(3)})`;
         ctx.font = "500 9px 'Space Grotesk', sans-serif";
         ctx.textAlign = 'center';
         ctx.textBaseline = labelDy > 0 ? 'top' : 'alphabetic';
