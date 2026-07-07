@@ -120,13 +120,18 @@ atlas_json = fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.js
 # ── 5b. Pre-render world map as static SVG (works in Quick Look / no-JS) ─────
 print('Generating SVG world map…')
 
-def _build_world_svg(atlas_json_str, W=800, H=400):
+def _build_world_svg(atlas_json_str, W=800, H=240):
     import json as _j
     data = _j.loads(atlas_json_str)
     tr = data['transform']
     sc, tl = tr['scale'], tr['translate']
     arcs = data['arcs']
-    LAT_MAX, LAT_MIN = 78, -56
+    # Cropped tight around the touring pins (Thailand ~14°N to Portugal ~39°N, Hawaii ~-158°
+    # to Thailand ~101°) instead of the full globe, so the pins render big enough to read and
+    # the box isn't mostly empty ocean. LAT_MAX is kept below ~50 so Alaska (part of the US,
+    # via Burning Man) doesn't poke a stray sliver in near the antimeridian at the top corner.
+    LAT_MAX, LAT_MIN = 48, 3
+    LON_MIN, LON_MAX = -168, 110
 
     def decode_arc(idx):
         rev = idx < 0
@@ -139,7 +144,7 @@ def _build_world_svg(atlas_json_str, W=800, H=400):
         return pts[::-1] if rev else pts
 
     def proj(lon, lat):
-        return (lon + 180) / 360 * W, (LAT_MAX - lat) / (LAT_MAX - LAT_MIN) * H
+        return (lon - LON_MIN) / (LON_MAX - LON_MIN) * W, (LAT_MAX - lat) / (LAT_MAX - LAT_MIN) * H
 
     def ring_d(ring_arcs):
         coords = []
@@ -157,26 +162,27 @@ def _build_world_svg(atlas_json_str, W=800, H=400):
                 for r in p: ds.append(ring_d(r))
         return ' '.join(d for d in ds if d)
 
-    # ISO numeric ids — must match data-country on .festival-row in the template
-    highlighted = {376, 840, 356, 764, 300, 784, 620}
-    normal, hl = [], []
-    for geo in data['objects']['countries']['geometries']:
-        gid = int(geo.get('id') or 0)
-        d = geo_d(geo)
-        if not d: continue
-        (hl if gid in highlighted else normal).append((gid, d))
+    # Countries are all drawn the same flat color — country-wide tinting/popping read as busy
+    # and unclear at this zoom. The pink dots + labels below are what mark "played here".
+    country_ds = [geo_d(geo) for geo in data['objects']['countries']['geometries']]
+    country_ds = [d for d in country_ds if d]
 
     # (label, lon, lat, label offset, ISO numeric country id)
+    # Crete is dropped: it's part of Greece and its dot/label crowded straight into
+    # the Greece/Israel cluster (all three sit within ~10° of each other).
+    # Hawaii and Los Angeles use id 0 (not 840): they're secondary US labels, like Thailand/
+    # Greece/Dubai are for their countries — real, but not a listed festival, so they shouldn't
+    # pop when Burning Man is hovered (only the Nevada dot should).
     locs = [
-        ('Tel Aviv',    34.78,  32.07, -10, 376),
-        ('Hawaii',    -157.8,   21.3,  -10, 840),
-        ('Los Angeles',-118.2,  34.05,  13, 840),
-        ('Goa',         73.83,  15.5,  -10, 356),
-        ('Thailand',   100.5,   13.75, -10, 764),
-        ('Greece',      23.7,   37.98, -10, 300),
-        ('Crete',       25.0,   35.3,   13, 300),
-        ('Portugal',    -8.2,   39.4,  -10, 620),
-        ('Dubai',       55.3,   25.2,  -10, 784),
+        ('Tel Aviv',    34.78,  32.07,  19, 376),
+        ('Hawaii',    -157.8,   21.3,  -15,   0),
+        ('Nevada',    -119.2,   40.8,  -15, 840),
+        ('Los Angeles',-118.2,  34.05,  19,   0),
+        ('Goa',         73.83,  15.5,  -15, 356),
+        ('Thailand',   100.5,   13.75, -15, 764),
+        ('Greece',      23.7,   37.98, -15, 300),
+        ('Portugal',    -8.2,   39.4,  -15, 620),
+        ('Dubai',       55.3,   25.2,  -15, 784),
     ]
 
     dots = []
@@ -184,24 +190,23 @@ def _build_world_svg(atlas_json_str, W=800, H=400):
         x, y = proj(lon, lat)
         dots.append(
             f'<g class="map-loc" data-country="{cid}">'
-            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="14" fill="rgba(255,30,140,0.08)"/>'
-            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="7" fill="rgba(255,30,140,0.18)"/>'
-            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="#FF1E8C"/>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="15" fill="rgba(255,30,140,0.10)"/>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="9" fill="rgba(255,30,140,0.22)"/>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="#FF1E8C" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>'
             f'<text x="{x:.1f}" y="{y+dy:.1f}" text-anchor="middle" '
-            f'font-family="\'Space Grotesk\',sans-serif" font-size="9" '
-            f'fill="rgba(244,242,248,0.75)">{label}</text>'
+            f'font-family="\'Space Grotesk\',sans-serif" font-size="12" font-weight="700" '
+            f'fill="rgba(244,242,248,0.92)">{label.upper()}</text>'
             f'</g>'
         )
 
-    normal_svg = ''.join(f'<path class="map-country" data-country="{gid}" d="{d}" fill="#18152A" stroke="rgba(255,255,255,0.07)" stroke-width="0.3"/>' for gid, d in normal)
-    hl_svg = ''.join(f'<path class="map-country" data-country="{gid}" d="{d}" fill="rgba(255,30,140,0.2)" stroke="rgba(255,30,140,0.5)" stroke-width="0.8"/>' for gid, d in hl)
+    countries_svg = ''.join(f'<path d="{d}" fill="#1D1A30" stroke="rgba(255,255,255,0.12)" stroke-width="0.4"/>' for d in country_ds)
     dots_svg = ''.join(dots)
 
     return (
         f'<svg viewBox="0 0 {W} {H}" xmlns="http://www.w3.org/2000/svg" '
         f'style="width:100%;height:auto;display:block;">'
         f'<rect width="{W}" height="{H}" fill="#0C0A13"/>'
-        f'{normal_svg}{hl_svg}{dots_svg}'
+        f'{countries_svg}{dots_svg}'
         f'</svg>'
     )
 
@@ -521,10 +526,10 @@ standalone_js = re.sub(
     standalone_js, flags=re.S
 )
 # Fix canvas.offsetHeight being 0 on iOS when aspect-ratio CSS isn't supported on <canvas>.
-# Fall back to computing height from the 2:1 ratio if offsetHeight is 0.
+# Fall back to computing height from the 10:3 ratio (matches the canvas's aspect-ratio CSS) if offsetHeight is 0.
 standalone_js = standalone_js.replace(
     'const H = canvas.offsetHeight;',
-    'const H = canvas.offsetHeight || (canvas.offsetWidth / 2);'
+    'const H = canvas.offsetHeight || (canvas.offsetWidth * 0.3);'
 )
 
 # Make draw() use ResizeObserver for reliable first-paint on any machine.
@@ -583,10 +588,10 @@ FESTIVAL_MAP_JS = '''<script>
   var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var pinned = null;
   function mapEls(id) {
-    return document.querySelectorAll('.map-country[data-country="' + id + '"], .map-loc[data-country="' + id + '"]');
+    return document.querySelectorAll('.map-loc[data-country="' + id + '"]');
   }
   function highlight(row) {
-    document.querySelectorAll('.map-country.map-pop, .map-loc.map-pop').forEach(function(el) { el.classList.remove('map-pop'); });
+    document.querySelectorAll('.map-loc.map-pop').forEach(function(el) { el.classList.remove('map-pop'); });
     rows.forEach(function(r) {
       r.classList.toggle('is-active', r === row);
       r.setAttribute('aria-pressed', r === row ? 'true' : 'false');

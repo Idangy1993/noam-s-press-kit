@@ -70,9 +70,7 @@
   .festival-country{font-family:'Space Grotesk';font-size:12px;color:rgba(244,242,248,.35);flex-shrink:0;transition:color .2s ease;}
   .festival-row:hover .festival-country,.festival-row.is-active .festival-country{color:rgba(244,242,248,.6);}
   .festival-hint{font-family:'Space Grotesk';font-size:10px;letter-spacing:.02em;color:rgba(244,242,248,.28);margin-top:10px;}
-  /* SVG map (shipped/static build): country + city pop state */
-  .map-country{transition:fill .28s ease,stroke .28s ease,filter .28s ease,transform .28s ease;transform-box:fill-box;transform-origin:center;}
-  .map-country.map-pop{fill:rgba(255,30,140,.55) !important;stroke:rgba(255,30,140,.95) !important;stroke-width:1.4;filter:drop-shadow(0 0 9px rgba(255,30,140,.75));transform:scale(1.05);}
+  /* SVG map (shipped/static build): city pin pop state */
   .map-loc{transition:transform .28s ease;transform-box:fill-box;transform-origin:center;}
   .map-loc.map-pop{transform:scale(1.35);}
 
@@ -303,7 +301,7 @@
         <!-- Right: world map canvas -->
         <div data-reveal style="opacity:0;transform:translateY(18px);transition:opacity .7s ease .12s,transform .7s ease .12s;">
           <div style="border-radius:14px;overflow:hidden;background:#0C0A13;border:1px solid rgba(255,255,255,.07);">
-            <canvas id="worldMap" style="width:100%;display:block;aspect-ratio:2/1;"></canvas>
+            <canvas id="worldMap" style="width:100%;display:block;aspect-ratio:10/3;"></canvas>
           </div>
           <p style="font-family:'Space Grotesk';font-size:11px;color:rgba(244,242,248,.22);letter-spacing:.06em;margin:10px 0 0;text-align:right;">Israel · US · India · Thailand · Greece · UAE · Portugal</p>
         </div>
@@ -794,7 +792,7 @@ class Component extends DCLogic {
 
     const draw = () => {
       const W = canvas.offsetWidth;
-      const H = canvas.offsetHeight || (canvas.offsetWidth / 2);
+      const H = canvas.offsetHeight;
       if (!W || !H) { setTimeout(draw, 100); return; }
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = W * dpr;
@@ -847,95 +845,67 @@ class Component extends DCLogic {
   }
 
   _drawMap(ctx, W, H, activeCountry, popT) {
-    const LAT_MAX = 78, LAT_MIN = -56;
+    // Cropped tight around the touring pins (Thailand ~14°N to Portugal ~39°N, Hawaii ~-158°
+    // to Thailand ~101°) instead of the full globe, so the countries we care about render big
+    // enough to read and the box isn't mostly empty ocean.
+    const LAT_MAX = 48, LAT_MIN = 3;
+    const LON_MIN = -168, LON_MAX = 110;
     const project = (lon, lat) => [
-      (lon + 180) / 360 * W,
+      (lon - LON_MIN) / (LON_MAX - LON_MIN) * W,
       (LAT_MAX - lat) / (LAT_MAX - LAT_MIN) * H
     ];
-
-    // ISO numeric IDs: Israel, USA, India, Thailand, Greece, UAE, Portugal
-    const highlighted = new Set([376, 840, 356, 764, 300, 784, 620]);
 
     ctx.fillStyle = '#0C0A13';
     ctx.fillRect(0, 0, W, H);
 
+    // Countries are all drawn the same flat color — country-wide tinting/popping read as
+    // busy and unclear at this zoom. The pink dots + labels below are what mark "played here".
     const countries = window.topojson.feature(this._worldTopo, this._worldTopo.objects.countries);
-    const activeFeature = activeCountry ? countries.features.find(f => parseInt(f.id) === activeCountry) : null;
-
     countries.features.forEach(f => {
-      const id = parseInt(f.id);
-      if (id === activeCountry) return; // drawn last, on top, so its glow isn't clipped by neighbors
       ctx.beginPath();
       this._geoPath(ctx, f.geometry, project);
-      if (highlighted.has(id)) {
-        ctx.fillStyle = 'rgba(255,30,140,.2)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,30,140,.5)';
-        ctx.lineWidth = 0.8;
-      } else {
-        ctx.fillStyle = '#18152A';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,.07)';
-        ctx.lineWidth = 0.3;
-      }
+      ctx.fillStyle = '#1D1A30';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.12)';
+      ctx.lineWidth = 0.4;
       ctx.stroke();
     });
 
-    // Popped-out active country: scaled up around its own centroid, with a soft glow
-    if (activeFeature && popT > 0.01) {
-      let sx = 0, sy = 0, n = 0;
-      const addRing = (coords) => coords.forEach(([lon, lat]) => { const [x, y] = project(lon, lat); sx += x; sy += y; n++; });
-      if (activeFeature.geometry.type === 'Polygon') activeFeature.geometry.coordinates.forEach(addRing);
-      else if (activeFeature.geometry.type === 'MultiPolygon') activeFeature.geometry.coordinates.forEach(p => p.forEach(addRing));
-      const cx = n ? sx / n : W / 2, cy = n ? sy / n : H / 2;
-
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.scale(1 + 0.08 * popT, 1 + 0.08 * popT);
-      ctx.translate(-cx, -cy);
-      ctx.shadowColor = 'rgba(255,30,140,.9)';
-      ctx.shadowBlur = 22 * popT;
-      ctx.beginPath();
-      this._geoPath(ctx, activeFeature.geometry, project);
-      ctx.fillStyle = `rgba(255,30,140,${(0.2 + 0.55 * popT).toFixed(3)})`;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = `rgba(255,30,140,${(0.5 + 0.5 * popT).toFixed(3)})`;
-      ctx.lineWidth = 0.8 + 1.4 * popT;
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // [label, lon, lat, labelDy, countryId] — labelDy>0 draws label below the dot to avoid collisions
+    // [label, lon, lat, labelDy, countryId] — labelDy>0 draws label below the dot to avoid collisions.
+    // Crete is dropped: it's part of Greece and its dot/label crowded straight into the
+    // Greece/Israel cluster (all three sit within ~10° of each other).
+    // Hawaii and Los Angeles use countryId 0 (not 840): they're secondary US labels, like
+    // Thailand/Greece/Dubai are for their countries — real, but not a listed festival, so
+    // they shouldn't boost when Burning Man is hovered (only the Nevada dot should).
     const locs = [
-      ['Tel Aviv',    34.78,  32.07, -12, 376],
-      ['Hawaii',    -157.8,   21.3,  -12, 840],
-      ['Los Angeles', -118.2,  34.05,  16, 840],
-      ['Goa',         73.83,  15.5,  -12, 356],
-      ['Thailand',   100.5,   13.75, -12, 764],
-      ['Greece',      23.7,   37.98, -12, 300],
-      ['Crete',       25.0,   35.3,   16, 300],
-      ['Portugal',    -8.2,   39.4,  -12, 620],
-      ['Dubai',       55.3,   25.2,  -12, 784],
+      ['Tel Aviv',    34.78,  32.07,  21, 376],
+      ['Hawaii',    -157.8,   21.3,  -17,   0],
+      ['Nevada',    -119.2,   40.8,  -17, 840],
+      ['Los Angeles', -118.2,  34.05,  21,   0],
+      ['Goa',         73.83,  15.5,  -17, 356],
+      ['Thailand',   100.5,   13.75, -17, 764],
+      ['Greece',      23.7,   37.98, -17, 300],
+      ['Portugal',    -8.2,   39.4,  -17, 620],
+      ['Dubai',       55.3,   25.2,  -17, 784],
     ];
 
     locs.forEach(([label, lon, lat, labelDy, countryId]) => {
       const [x, y] = project(lon, lat);
       const boost = countryId === activeCountry ? popT : 0;
-      const glowR = 20 + 12 * boost;
+      const glowR = 20 + 14 * boost;
       const glow = ctx.createRadialGradient(x, y, 0, x, y, glowR);
-      glow.addColorStop(0, `rgba(255,30,140,${(0.5 + 0.35 * boost).toFixed(3)})`);
+      glow.addColorStop(0, `rgba(255,30,140,${(0.55 + 0.35 * boost).toFixed(3)})`);
       glow.addColorStop(1, 'rgba(255,30,140,0)');
       ctx.fillStyle = glow;
       ctx.beginPath(); ctx.arc(x, y, glowR, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#FF1E8C';
-      ctx.beginPath(); ctx.arc(x, y, 3.5 + 2.5 * boost, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,.55)';
-      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(x, y, 4.5 + 2.5 * boost, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.6)';
+      ctx.lineWidth = 1.2;
       ctx.stroke();
-      if (W >= 480) {
-        ctx.fillStyle = `rgba(244,242,248,${(0.72 + 0.28 * boost).toFixed(3)})`;
-        ctx.font = "500 9px 'Space Grotesk', sans-serif";
+      if (W >= 380) {
+        ctx.fillStyle = `rgba(244,242,248,${(0.92 + 0.08 * boost).toFixed(3)})`;
+        ctx.font = `700 ${(11 + 1.5 * boost).toFixed(1)}px 'Space Grotesk', sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = labelDy > 0 ? 'top' : 'alphabetic';
         ctx.fillText(label.toUpperCase(), x, y + labelDy);
